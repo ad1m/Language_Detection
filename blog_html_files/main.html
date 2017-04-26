@@ -74,18 +74,27 @@
     <h1>History of the LSTM</h1>
     <p>In 1991, Dr. Jürgen Schmiduber and his former PhD student Sepp Hochreiter proposed a feedback network to overcome the vanishing and exploding gradient problem found with RNNs. In 1997, Schmidhuber and Hochreiter published the paper <a href="http://www.bioinf.jku.at/publications/older/2604.pdf">Long Short-Term Memory</a>. In this paper they reivew Hochreiter's 1991 analysis of the problem of insufficient decaying error back flow in recurrent backpropogation. They combatted this problem by introducing the Long Short-Term Memory (LSTM). In the 90's, computing was still expensive and computing resources were not advanced, so LSTMs were not widely adopted. Fast forward 10 years and services like Amazon AWS and Microsoft Azure offered inexpensive computing which brought massive attention to LSTMs.</p>    
     <h1>What are LSTMs?</h1>
-    <p>Long Short-Term Memory networks are a type of recurrent neural network, which overcome the vanishing gradient problem found in a regular RNN. They typical LSTM has 3 main gates:</p>
+    <p>Long Short-Term Memory networks are a type of recurrent neural network, which overcome the vanishing gradient problem found in a regular RNN. They typical LSTM has 3 main gates and a cell unit:</p>
     <ul>
     <li><b>Input Gate: </b>The input gate controls how much of the newly computed state for the current input that you want to let through.</li>
     <li><b>Forget Gate: </b>The forget gate defines how much of the previous state you want to let through.</li>
     <li><b>Output Gate: </b>The output gate defines how much of the interant state you want to expose to the external network.</li>
+    <p>Mathematically, we can define these gates as equations as follows:</p>
+    $$i_t = g(W_{x_i}x_t + W_{h_i}h_{t-1}+b_i)$$
+    $$f_t = g(W_{x_f}x_t + W_{h_f}h_{t-1}+b_f)$$
+    $$o_t = g(W_{x_o}x_t+W_{h_o}h_{t-1}+b_o)$$
+    <p>Above, $i_t$ is the input gate, $f_t$ is the forget gate, $o_t$ is the output gate, $g$ is a sigmoid activation function, $W$ represents a particular weight, and $b$ is a bias.</p>
+    <p>The cell unit can be transformed as:</p>
+    $$ c_{in_t} = \text{tanh}\left(W_{xc}x_t + W_{hc}h_{t-1}+b_{c_{in}}\right)$$
+    <p>where $h_t = o_t \cdot \text{tanh} \left(c_t\right)$. The state can then be updated as:</p>
+    $$c_t = f_t \cdot c_{t-1} + i_t \cdot c_{in_t}$$
     <!--<li><b>Cell Unit: </b>Here, information can be stored in, written to, or read from a cell. This is similar to memory in a computer. This cell makes decisions on what to store, when to read, when to write, and when to erase through gates that open and close.</li> -->
     </ul>
 
     
 
     <h1>Improving Performance of LSTMs:</h1>
-
+    <p>Add bias of 1 in every neuron.</p>
 
 
     <h1>Applications & Current Research: </h1>
