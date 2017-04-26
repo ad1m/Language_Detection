@@ -88,6 +88,9 @@
     $$ c_{in_t} = \text{tanh}\left(W_{xc}x_t + W_{hc}h_{t-1}+b_{c_{in}}\right)$$
     <p>where $h_t = o_t \cdot \text{tanh} \left(c_t\right)$. The state can then be updated as:</p>
     $$c_t = f_t \cdot c_{t-1} + i_t \cdot c_{in_t}$$
+    <p>We can depict all of these equations graphically as:</p>
+    <center><img src="../images/LSTM.png" style="width:230px"></center>
+    <p>The gating allows the cell to keep pieces of information for prolonged periods of time while protecting the gradient inside the cell during training. This ensures that the gradient does not explode or vanish from multiple activations being processed.</p>
     <!--<li><b>Cell Unit: </b>Here, information can be stored in, written to, or read from a cell. This is similar to memory in a computer. This cell makes decisions on what to store, when to read, when to write, and when to erase through gates that open and close.</li> -->
     </ul>
 
