@@ -44,7 +44,7 @@
     <section class="main-content">
     <h1>Introduction</h1>
     <!-- Explain why we want to do facial generation and current ways facial generations is done-->
-    <p>Radford's paper <a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks</a> lays the framework and architecture for building a deep convolutional generative adversarial network (DCGAN). Convolutional layers have been great for image based deep learning regarding tasks like image classification in the field of computer vision. Additionally, DCGAN models can improve stability during training so that we hopefully do not encounter issues like mode collapse. Our goal is to build a DCGAN that can generate synthetic facial images. We will follow the steps Radford used in his paper to build out our model.</p>
+    <!--<p>Radford's paper <a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks</a> lays the framework and architecture for building a deep convolutional generative adversarial network (DCGAN). Convolutional layers have been great for image based deep learning regarding tasks like image classification in the field of computer vision. Additionally, DCGAN models can improve stability during training so that we hopefully do not encounter issues like mode collapse. Our goal is to build a DCGAN that can generate synthetic facial images. We will follow the steps Radford used in his paper to build out our model.</p>
 
     <h1>Environment Setup</h1>
     <p>Below we have a description of each library we will use. Please click the links under installation and documentation to install and learn more about each library.</p>
@@ -111,10 +111,10 @@
     <h1>Data</h1>
     <p>We will be using data from the Labeled Faces in the Wild (LFW) database. This database consists of more than 13,000 grayscale images of faces collected from the web. Additionally, each face has been labeled with the name of the person pictured. The data can be downloaded from <a href="http://vis-www.cs.umass.edu/lfw/">here</a>. Additionally, we can access the datasets module in sklearn and pull the data using the fetch_lfw_people function. This will return our data in a dataset object, which is a dictionary like structure. Let us now proceed to write a class and a few fuctions to read in and format our data.</p>
 
-    <p>We start by creating a class called Data_Set. In this class we take in our vector of images. In our init method we will calculate the number of samples we have in the images vector, normalize the images, and set the number of epochs completed and index of the epochs to 0. We will need the number epochs completed and the index of the epochs when we train our generative adversarial network. We will also create some getters for the number of images, number of samples, and the number of epochs completed. Finally, we will create a method called batch_next. This takes in a batch size and will perform a sequential pull of this batch size for our training data. Our class is as follows:</p>
+    <p>We start by creating a class called Data_Set. In this class we take in our vector of images. In our init method we will calculate the number of samples we have in the images vector, normalize the images, and set the number of epochs completed and index of the epochs to 0. We will need the number epochs completed and the index of the epochs when we train our generative adversarial network. We will also create some getters for the number of images, number of samples, and the number of epochs completed. Finally, we will create a method called batch_next. This takes in a batch size and will perform a sequential pull of this batch size for our training data. Our class is as follows:</p> -->
 
 
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">class</span> <span style="color: #00aa00; text-decoration: underline">Data_Set</span>(<span style="color: #00aaaa">object</span>):
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">class</span> <span style="color: #00aa00; text-decoration: underline">Data_Set</span>(<span style="color: #00aaaa">object</span>):
     
     <span style="color: #aaaaaa; font-style: italic">#Parameter Initialization</span>
     <span style="color: #0000aa">def</span> <span style="color: #00aa00">__init__</span>(<span style="color: #00aaaa">self</span>, images):
@@ -154,8 +154,8 @@
     <br>
     <li>Resize: The Ratio used to resize the each facial picture. This value is specified as a float and defaults to 0.5. The original images are 250 x 250 pixels, but the default slice and resize arguments reduce them to 62 x 74. We, however, want our our images to be 28 x 28. To do so we can set the resize = 0.224.</li>
     </ul>
-    <p>Once we call the fetch_lfw_people module we obtain a dataset object. We can then use the .data function to extract a vector of the facial images. We can then create the Data_Set object, which we created in the class above, by passing in our vector of the facial images. We create our pull_data function as follows:</p>
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">pull_data</span>():
+    <p>Once we call the fetch_lfw_people module we obtain a dataset object. We can then use the .data function to extract a vector of the facial images. We can then create the Data_Set object, which we created in the class above, by passing in our vector of the facial images. We create our pull_data function as follows:</p> -->
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">pull_data</span>():
     <span style="color: #0000aa">class</span> <span style="color: #00aa00; text-decoration: underline">Data_Sets</span>(<span style="color: #00aaaa">object</span>):
         <span style="color: #0000aa">pass</span>
     data_sets = Data_Sets()
@@ -169,23 +169,23 @@
     <span style="color: #0000aa">return</span> data_sets
 </pre></div>
 
-    <p>We can now obtain our data by doing the following:</p>
+    <p>We can now obtain our data by doing the following:</p> -->
 
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">data = pull_data()
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">data = pull_data()
 </pre></div>
 
-    <p>We can check the size of our data as follows:</p>
+    <p>We can check the size of our data as follows:</p> -->
 
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">print</span>(data.train.images.shape)
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">print</span>(data.train.images.shape)
 &gt;&gt;&gt;
 (<span style="color: #009999">13233</span>, <span style="color: #009999">784</span>)
 </pre></div>
 
     <p>Above, we see that we have 13,233 samples where each sample is a vector of length 784. We see that this is a flattened 28 x 28 vector as 28 x 28 = 784.</p>
 
-    <p>Now that we have our data, let us see what a sample of it looks like. To do so we write a function called display_images which takes in our data and some indices we want to display from the data. Here we use data.train.images to obtain an ndarray of normalized image values. We loop over our indices and look at the image inside data.train.images of that particular index and unnormalize it. We also reshape it into a 28 x 28 image and then use the python library PIL's imshow function to show the image. We do this for every image in the list of indices we specify. Our function is as follows:</p>
+    <p>Now that we have our data, let us see what a sample of it looks like. To do so we write a function called display_images which takes in our data and some indices we want to display from the data. Here we use data.train.images to obtain an ndarray of normalized image values. We loop over our indices and look at the image inside data.train.images of that particular index and unnormalize it. We also reshape it into a 28 x 28 image and then use the python library PIL's imshow function to show the image. We do this for every image in the list of indices we specify. Our function is as follows:</p> -->
 
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">display_images</span>(data,indices): 
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">display_images</span>(data,indices): 
     
     <span style="color: #aaaaaa; font-style: italic">#Obtain the images inside data </span>
     im_data = data.train.images
@@ -222,9 +222,9 @@ display_images(data,[<span style="color: #009999">4</span>,<span style="color: #
     </ul>
 
     <h1>Leaky Rectified Linear Unit</h1>
-    <p>Before we move on to creating our generator and discriminator let us first construct a leaky rectified linear unit layer. When we use GANs we want to avoid sparse gradients to prevent suffering in terms of GAN stability. This means we should stear clear from ReLU and MaxPool layers. Instead we can use this leaky rectified linear unit layer. Let us create a function called lrelu that takes in x, a leak value, and the name "lrelu". Inside we use tf.variable_scope("lrelu") and set f1 to 0.5 * (1 + leak) and f2 to 0.5 * (1 - leak). We then return f1 * x + f2 * abs(x). We will use the leaky rectified linear unit layer in our discriminator as noted in the DCGAN architecture above. We build our function as follows:</p>
+    <p>Before we move on to creating our generator and discriminator let us first construct a leaky rectified linear unit layer. When we use GANs we want to avoid sparse gradients to prevent suffering in terms of GAN stability. This means we should stear clear from ReLU and MaxPool layers. Instead we can use this leaky rectified linear unit layer. Let us create a function called lrelu that takes in x, a leak value, and the name "lrelu". Inside we use tf.variable_scope("lrelu") and set f1 to 0.5 * (1 + leak) and f2 to 0.5 * (1 - leak). We then return f1 * x + f2 * abs(x). We will use the leaky rectified linear unit layer in our discriminator as noted in the DCGAN architecture above. We build our function as follows:</p> -->
 
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">lrelu</span>(x, leak=<span style="color: #009999">0.2</span>, name=<span style="color: #aa5500">&quot;lrelu&quot;</span>):
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">lrelu</span>(x, leak=<span style="color: #009999">0.2</span>, name=<span style="color: #aa5500">&quot;lrelu&quot;</span>):
     <span style="color: #0000aa">with</span> tf.variable_scope(name):
         f1 = <span style="color: #009999">0.5</span> * (<span style="color: #009999">1</span> + leak)
         f2 = <span style="color: #009999">0.5</span> * (<span style="color: #009999">1</span> - leak)
@@ -244,8 +244,8 @@ display_images(data,[<span style="color: #009999">4</span>,<span style="color: #
         <li>Deconvolutional Layer 3 - batch normalization, relu activation</li>
         <li>Deconvolutional Layer 4 - batch normalization, tanh activation</li>
     </ul>
-    <p>All in all, our generator will take in a vector consisting of random numbers from a uniform distribution, pass through four fractionally-strided convolutions (called deconvolutions), and then output an image with shape 32 x 32. We construct our generator model, called generator, with an input called z_shp. This is the shape of our z in the above architecture description. Our function is as follows:</p>
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">generator</span>(z_shp):
+    <p>All in all, our generator will take in a vector consisting of random numbers from a uniform distribution, pass through four fractionally-strided convolutions (called deconvolutions), and then output an image with shape 32 x 32. We construct our generator model, called generator, with an input called z_shp. This is the shape of our z in the above architecture description. Our function is as follows:</p> -->
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">generator</span>(z_shp):
     
     <span style="color: #aaaaaa; font-style: italic">#Commonly Used Variables</span>
     PADDING = <span style="color: #aa5500">&quot;SAME&quot;</span>
@@ -287,16 +287,16 @@ display_images(data,[<span style="color: #009999">4</span>,<span style="color: #
 
 <h1>Discriminator</h1>
 <p>Now that we have our generator to generate synthetic images, let us now create our discriminator. Our discriminator achitecture is as follows:</p>
-<center><img src="../images/disc.png"></center>
+<center><img src="../images/disc.png"></center> -->
 <!--<ul>
 <li>Convolutional Layer 1 - leaky relu activation</li>
 <li>Convolutional Layer 2 - leaky relu activation</li>
 <li>Convolutional Layer 3 - leaky relu activation</li>
 <li>Fully Connected Layer  - Sigmoid activation</li>
 </ul> -->
-<p>Here we will input a 32 x 32 image and pass it through three convolutional layers that have a leaky rectified linear unit activation. We will then pass through a fully connected layer with a sigmoid activation function and will return a single valued probability representing whether the generated image is a "real" image or a "fake" image. We create the discriminator as follows:</p>
+<!--<p>Here we will input a 32 x 32 image and pass it through three convolutional layers that have a leaky rectified linear unit activation. We will then pass through a fully connected layer with a sigmoid activation function and will return a single valued probability representing whether the generated image is a "real" image or a "fake" image. We create the discriminator as follows:</p> -->
 
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">discriminator</span>(bottom, reuse=<span style="color: #00aaaa">False</span>):
+<!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">discriminator</span>(bottom, reuse=<span style="color: #00aaaa">False</span>):
     PADDING = <span style="color: #aa5500">&quot;SAME&quot;</span>
     STRIDE = [<span style="color: #009999">2</span>,<span style="color: #009999">2</span>]
     
@@ -323,10 +323,10 @@ display_images(data,[<span style="color: #009999">4</span>,<span style="color: #
 </pre></div>
 
 <h1>DCGAN Construction</h1>
-<p>Now that we have our generator and discriminator we can now create our deep convolutional generative adversarial network. We will create a variable called z_size which will be the size of the z vector used for our generator. We will then initialize all weights for our network. We do so here because we want to initialize the same weights. If we pass this into each weights_initializer parameter in our tf.slim code above we might be assigned different weights. We then create an input for the generator and discriminator and create the images for the random vectors and probabilites for the real images. We can then create the optimization objective and then apply gradient descent. We create our DCGAN model as follows:</p>
+<p>Now that we have our generator and discriminator we can now create our deep convolutional generative adversarial network. We will create a variable called z_size which will be the size of the z vector used for our generator. We will then initialize all weights for our network. We do so here because we want to initialize the same weights. If we pass this into each weights_initializer parameter in our tf.slim code above we might be assigned different weights. We then create an input for the generator and discriminator and create the images for the random vectors and probabilites for the real images. We can then create the optimization objective and then apply gradient descent. We create our DCGAN model as follows:</p> -->
 
 
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">tf.reset_default_graph()
+<!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">tf.reset_default_graph()
 
 z_size = <span style="color: #009999">100</span>
 
@@ -373,9 +373,9 @@ update_G = trainerG.apply_gradients(gradients_generator)
 </pre></div>
 
 <h1>Saving Generated Images</h1>
-<p>Our GAN will create synthetic images during training. Let us now write a function called save_generated_images to save our generated images. Here we will take in a vector of images, a size, and a path to save them. We will create a vector of zeros that is of size image height x width multiplied by the size we pass in (for instance size = [6,6]). We will then extract the images we want to save and return a block of images (6 x 6) so we can see how our model improves over time. We do so as follows:</p>
+<p>Our GAN will create synthetic images during training. Let us now write a function called save_generated_images to save our generated images. Here we will take in a vector of images, a size, and a path to save them. We will create a vector of zeros that is of size image height x width multiplied by the size we pass in (for instance size = [6,6]). We will then extract the images we want to save and return a block of images (6 x 6) so we can see how our model improves over time. We do so as follows:</p> -->
 
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">save_generated_images</span>(images,size,image_path): 
+<!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">save_generated_images</span>(images,size,image_path): 
     images = (images+<span style="color: #009999">1.</span>)/<span style="color: #009999">2.</span>
     height = images.shape[<span style="color: #009999">1</span>]
     width = images.shape[<span style="color: #009999">2</span>]
@@ -389,9 +389,9 @@ update_G = trainerG.apply_gradients(gradients_generator)
 </pre></div>
 
     <h1>DCGAN Training</h1>
-    <p>Let us now train our network on our machine ( I am using a retina macbook pro with 8gb of ram). Since we are not using a GPU right now (we will do so in the next section), we will use 5000 iterations and a batch size of 128. Here, we will choose a sample batch from our facial image data using the class function batch_next and shape it into a 32 x 32 image. We will then generate a random batch, z, and update the generator and discriminator. Every 15 iterations we will calculate our loss for both the generator and discriminator and plot them on an updating plot. We will also save some sample generated images (36 sample generated images in a 6 x 6 grid) from the generator at this stage. We will save these images into a directory called facial_figs. Every 1000 iterations we will save our model attributes into a directory called facial_models. We train our model as follows:</p>
+    <p>Let us now train our network on our machine ( I am using a retina macbook pro with 8gb of ram). Since we are not using a GPU right now (we will do so in the next section), we will use 5000 iterations and a batch size of 128. Here, we will choose a sample batch from our facial image data using the class function batch_next and shape it into a 32 x 32 image. We will then generate a random batch, z, and update the generator and discriminator. Every 15 iterations we will calculate our loss for both the generator and discriminator and plot them on an updating plot. We will also save some sample generated images (36 sample generated images in a 6 x 6 grid) from the generator at this stage. We will save these images into a directory called facial_figs. Every 1000 iterations we will save our model attributes into a directory called facial_models. We train our model as follows:</p> -->
 
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #aaaaaa; font-style: italic">#size setups</span>
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #aaaaaa; font-style: italic">#size setups</span>
 batch_size = <span style="color: #009999">128</span>
 iterations = <span style="color: #009999">5000</span> 
 
@@ -529,9 +529,9 @@ plt_x = np.array([])
     <center><img src="../images/AJL_GAN_training_LFW.gif"></center>
 
     <h1>Query Our DCGAN</h1>
-    <p>Now that we have a trained model, where we can clearly see facial images, let us write a function to query new facial images. We first load in our saved model from the facial_models directory. Then, we pass in a vector of random uniformly distributed numbers of the batch size specified previously to the generator and generate a set of 6 x 6 images, which will be saved in a directory called synthetic_faces. We wrap the random number process and image generation in a for loop so we can repeat this k times. Our code is as follows:</p>
+    <p>Now that we have a trained model, where we can clearly see facial images, let us write a function to query new facial images. We first load in our saved model from the facial_models directory. Then, we pass in a vector of random uniformly distributed numbers of the batch size specified previously to the generator and generate a set of 6 x 6 images, which will be saved in a directory called synthetic_faces. We wrap the random number process and image generation in a for loop so we can repeat this k times. Our code is as follows:</p> -->
 
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">batch_size_sample = <span style="color: #009999">36</span>
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">batch_size_sample = <span style="color: #009999">36</span>
 num_img = <span style="color: #009999">10</span>
 init = tf.initialize_all_variables()
 saver = tf.train.Saver()
@@ -565,9 +565,9 @@ saver = tf.train.Saver()
 
     <h1>DCGAN On A GPU</h1>
 
-    <p>We see that we had good success in generating facial images by training 5,000 iterations over 8 hours on our machine's CPU. Using a GPU will allow us to train many more iterations in much less time. Amazon Web Services (AWS) offers a low cost hourly charge to run code on their powerful machines. We will make use of the p2.8xlarge machine for training our model. This machine has 8 GPUs, 32 vCPU, 488 GiB of memory, 19968 parallel processing cores, 96 GiB of GPU memory, and 10 Gigabit network performance. This is a very powerful machine and at the cost of $\$7.20$ per hour we can train for 50,000 iterations in about 85 minutes. This might sound expensive, but we are going to use AWS spot pricing. Here, the current spot price (always changing) is $\$0.905$ per hour. So, for less than $\$2$ we can train our DCGAN model on a high powered machine packed with multiple GPUs for 50,000 iterations. To do so, we need to enable our TensorFlow code to use a GPU. Now, when we create our DCGAN model by combining the generator and discriminator, we need to set DEVICE = '/gpu:0' and wrap our code inside with tf.device(DEVICE). We make the change as follows:</p> 
+    <p>We see that we had good success in generating facial images by training 5,000 iterations over 8 hours on our machine's CPU. Using a GPU will allow us to train many more iterations in much less time. Amazon Web Services (AWS) offers a low cost hourly charge to run code on their powerful machines. We will make use of the p2.8xlarge machine for training our model. This machine has 8 GPUs, 32 vCPU, 488 GiB of memory, 19968 parallel processing cores, 96 GiB of GPU memory, and 10 Gigabit network performance. This is a very powerful machine and at the cost of $\$7.20$ per hour we can train for 50,000 iterations in about 85 minutes. This might sound expensive, but we are going to use AWS spot pricing. Here, the current spot price (always changing) is $\$0.905$ per hour. So, for less than $\$2$ we can train our DCGAN model on a high powered machine packed with multiple GPUs for 50,000 iterations. To do so, we need to enable our TensorFlow code to use a GPU. Now, when we create our DCGAN model by combining the generator and discriminator, we need to set DEVICE = '/gpu:0' and wrap our code inside with tf.device(DEVICE). We make the change as follows:</p> -->
 
-    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">DEVICE=<span style="color: #aa5500">&#39;/gpu:0&#39;</span>
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">DEVICE=<span style="color: #aa5500">&#39;/gpu:0&#39;</span>
 <span style="color: #0000aa">with</span> tf.device(DEVICE):
     tf.reset_default_graph()
 
@@ -615,9 +615,9 @@ saver = tf.train.Saver()
     update_G = trainerG.apply_gradients(gradients_generator)
 </pre></div>
 
-<p>We can now apply our previous code, shown below, to start training the model on the AWS instance. We will save all generated images and model parameters to the directories gpu_facial_figs and gpu_facial_models.</p>
+<p>We can now apply our previous code, shown below, to start training the model on the AWS instance. We will save all generated images and model parameters to the directories gpu_facial_figs and gpu_facial_models.</p> -->
 
-<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #aaaaaa; font-style: italic">#size setups</span>
+<!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #aaaaaa; font-style: italic">#size setups</span>
 batch_size = <span style="color: #009999">128</span>
 iterations = <span style="color: #009999">50000</span> 
 
@@ -696,16 +696,16 @@ plt_x = np.array([])
     <p>After training on the GPU for 50,000 iterations, our images look much more realistic.</p>
 
     <h1>Code</h1>
-    <p>We have successfully built a DCGAN model and generated synthetic facial images on both a CPU and GPU. All code for this tutorial is available for download in an iPython format <a href="DCGAN_code.zip">here</a>.</p>
+    <p>We have successfully built a DCGAN model and generated synthetic facial images on both a CPU and GPU. All code for this tutorial is available for download in an iPython format <a href="DCGAN_code.zip">here</a>.</p> -->
 
     <h1>References:</h1>
     <ul>
-    <li><a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning With Deep Convolutional Generative Adversarial Networks</a></li>
+    <!--<li><a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning With Deep Convolutional Generative Adversarial Networks</a></li>
     <li><a href="http://blog.aylien.com/introduction-generative-adversarial-networks-code-tensorflow/">Introduction to GANs with Tensorflow</a></li>
     <li><a href="https://medium.com/@awjuliani/generative-adversarial-networks-explained-with-a-classic-spongebob-squarepants-episode-54deab2fce39">GANs with Tensorflow</a></li>
     <li><a href="https://github.com/sugyan/tf-dcgan/blob/master/dcgan.py">DCGAN with Tensorflow</a></li>
     <li><a href="http://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_lfw_people.html">LFW Sklearn Dataset Documentation</a></li>
-    <li><a href="http://vis-www.cs.umass.edu/lfw/">LFW dataset</a></li>
+    <li><a href="http://vis-www.cs.umass.edu/lfw/">LFW dataset</a></li> -->
     </ul>
 
     <br><br>
