@@ -62,22 +62,24 @@
     <p>Above, we see that the input passes through the hidden layer which is then connected to the output layer to generate the outputs. The information is fed straight through, from left to right, never touching a given node twice.</p>  
 
     <h4>Recurrent Neural Networks:</h4>
-    <p>Recurrent neural networks (RNNs) are a family of neural networks for processing sequential data, a sequence of values $x^{(1),x^{(2)},...,x^{(t)}}$. In a traditional neural network, like the feed forward network above, we assume that all inputs and outputs are independent of each other. This is not the case for all tasks. If we are building a chat bot and want to predict the next word in reply, we need to know the words that came before it. Essentially, RNNs have memory. Every element in the sequence has the same task performed on it, with the output being dependant on the previous computations. An RNN looks as follows:</p>
+    <p>Recurrent neural networks (RNNs) are a family of neural networks for processing sequential data, a sequence of values $x^{(1)},x^{(2)},...,x^{(t)}$. In a traditional neural network, like the feed forward network above, we assume that all inputs and outputs are independent of each other. This is not the case for all tasks. If we are building a chat bot and want to predict the next word in reply, we need to know the words that came before it. Essentially, RNNs have memory. Every element in the sequence has the same task performed on it, with the output being dependant on the previous computations. An RNN looks as follows:</p>
     <center><img src="../images/RNN-unrolled.png"></center>
     <p>Here, we see that the sample $x_t$ is generated based on $x_0, x_1, ..., x_{t-1}$ and the output, $h_t$, is dependent on what comes before it. We see that the network forms loops. The first input is passed into its hidden layer and generates some output $h_0$. The second sequential input is passed into its hidden layer and so is the output from $h_0$. The activation function in hidden layer $h_1$ is activated on the second sample and this is then added with $h_0$. This process is then repeated until the last item in the sequence $x_t$. Traditionally, we depict this nature in the following image:</p> 
     <center><img src="../images/RNN-rolled.png" style="height:180px"></center>
     <p>In the 1990's the vanishing gradient problem emerged as a major obstacle to RNN performance. The gradient expresses the change in all weights with respect to the change in error. Thus, not knowing the gradient foes not allow us to adjust the weigths in a direction taht will reduce the error. If we can't do this then the network will not learn. If any quantity is multiplied by a slightly larger quantity in a repeated fashion, the quantity can become very large. This is also true for the reverse case. If we multiply a quantity repeatedly by a quantity less than one, the quantity will become infitesimal. If this is hard to see, imagine that you are a gambler. You keep betting 1 dollar, but win 97 cents on that dollar every bet. You will soon see that this is not sustainable and you will go bankrupt very soon. The layers and timesteps in an RNN relate to each other through multiplication so the derivatives are susceptible to explosion or vanishing. For instance, let us look at multiple applications of the sigmoid in a repeated fashion:</p>
     <center><img src="../images/sigmoid_repeat.png" style="width:400px"></center>
     <p>The sigmoid activation function is a popular activation in RNN's. We see here that the slope of the data becomes negligble and hence undetectable, thus vanishing.</p>
+    <p>RNN's were a great achievement. They were able to learn on sequential data where feed forward networks failed, but do suffer from the vanishing gradient problem.</p>
 
     <h1>History of the LSTM</h1>
-    <p>Recurrent Neural Networks were present in the 1990s, however they had a problem. They could not look far back into the past. In 1991, Dr. Jürgen Schmiduber and his former PhD student Sepp Hochreiter proposed a feedback network to overcome the traditional problems of RNNs. Hochreiter showed that deep neural networks were hard to train because they suffer from vanishing or exploding gradients. This was typically the case in RNNs. They either shrunk rapidly or grew wildly out of bounds. In 1997, Schmidhuber and Hochreiter published the paper <a href="http://www.bioinf.jku.at/publications/older/2604.pdf">Long Short-Term Memory</a>. In this paper they reivew Hochreiter's 1991 analysis of the problem of insufficient decaying error back flow in recurrent backpropogation. They combatted this problem by introducing the Long Short-Term Memory (LSTM). In the 90's, computing was still expensive and computing resources were not advanced, so LSTMs were not widely adopted. Fast forward 10 years and services like Amazon AWS and Microsoft Azure offered inexpensive computing which brought massive attention to LSTMs.</p>    
+    <p>In 1991, Dr. Jürgen Schmiduber and his former PhD student Sepp Hochreiter proposed a feedback network to overcome the vanishing and exploding gradient problem found with RNNs. In 1997, Schmidhuber and Hochreiter published the paper <a href="http://www.bioinf.jku.at/publications/older/2604.pdf">Long Short-Term Memory</a>. In this paper they reivew Hochreiter's 1991 analysis of the problem of insufficient decaying error back flow in recurrent backpropogation. They combatted this problem by introducing the Long Short-Term Memory (LSTM). In the 90's, computing was still expensive and computing resources were not advanced, so LSTMs were not widely adopted. Fast forward 10 years and services like Amazon AWS and Microsoft Azure offered inexpensive computing which brought massive attention to LSTMs.</p>    
     <h1>What are LSTMs?</h1>
-    <p>Long Short-Term Memory networks are a type of recurrent neural network, which overcome the vanishing gradient problem found in a regular RNN. There are multiple variations of LSTMs, but here we will discuss a common form, which consists of the following gates:</p>
+    <p>Long Short-Term Memory networks are a type of recurrent neural network, which overcome the vanishing gradient problem found in a regular RNN. They typical LSTM has 3 main gates:</p>
     <ul>
-    <li><b>Input Gate: </b></li>
-    <li><b>Forget Gate: </b></li>
-    <li><b>Cell Unit: </b></li>
+    <li><b>Input Gate: </b>The input gate controls how much of the newly computed state for the current input that you want to let through.</li>
+    <li><b>Forget Gate: </b>The forget gate defines how much of the previous state you want to let through.</li>
+    <li><b>Output Gate: </b>The output gate defines how much of the interant state you want to expose to the external network.</li>
+    <!--<li><b>Cell Unit: </b>Here, information can be stored in, written to, or read from a cell. This is similar to memory in a computer. This cell makes decisions on what to store, when to read, when to write, and when to erase through gates that open and close.</li> -->
     </ul>
 
     
@@ -95,7 +97,7 @@
   <h1>Further Resources</h1>
   <p>A lot of work has been done on LSTMs. Here are some alternate links worth checking out:</p>
   <h4>Presentations:</h4>
-  <ul>
+  <!--<ul>
   <li><a href="https://www.youtube.com/watch?v=HN9NRhm9waY">Ian Goodfellow AIWTB 2016 Lecture</a></li>
   <li><a href="https://www.youtube.com/watch?v=RvgYvHyT15E&t=1292s">Ian Goodfellow NIPS 2016 Workshop</a></li>
   <li><a href="https://arxiv.org/pdf/1701.00160.pdf">Ian Goodfellow 2016 NIPS Tutorial</a></li>
@@ -116,7 +118,7 @@
   <li><a href"https://arxiv.org/pdf/1511.06434.pdfï%C2%BC‰">Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks</a></li>
   <li><a href="https://pdfs.semanticscholar.org/42f6/f5454dda99d8989f9814989efd50fe807ee8.pdf">Conditional generative adversarial nets for convolutional face generation</a></li>
   <li><a href="https://arxiv.org/pdf/1610.01945.pdf">Connecting Generative Adversarial Networks and Actor-Critic Methods</a></li>
-  </ul> 
+  </ul>  -->
 
 
     <h1>Building our own LSTM:</h1>
