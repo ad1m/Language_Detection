@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Part 2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/cayman.css">
+    <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+      });
+    </script>
+  </head>
+  <body>
+
+    <style>
+    #right_div {
+    float: right;
+    border: 0px solid black;
+    text-align: center;
+}
+</style>
+
+
+    <section class="page-header">
+      <br>
+      <br>
+      <h1 class="project-name">Generative Adversarial Networks</h1>
+      <h2 class="project-tagline">Part 2: Building a Generative Adversarial Network</h2>
+      <h3 class="project-tagline">By: Adam Lieberman</h3>
+      <br>
+      <br>
+      <!--<a href="#" class="btn">View on GitHub</a>
+      <a href="#" class="btn">Download .zip</a>
+      <a href="#" class="btn">Download .tar.gz</a> -->
+    </section>
+
+    <section class="main-content">
+    <h1>Introduction</h1>
+    <!-- Explain why we want to do facial generation and current ways facial generations is done-->
+    <!--<p>Radford's paper <a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks</a> lays the framework and architecture for building a deep convolutional generative adversarial network (DCGAN). Convolutional layers have been great for image based deep learning regarding tasks like image classification in the field of computer vision. Additionally, DCGAN models can improve stability during training so that we hopefully do not encounter issues like mode collapse. Our goal is to build a DCGAN that can generate synthetic facial images. We will follow the steps Radford used in his paper to build out our model.</p>
+
+    <h1>Environment Setup</h1>
+    <p>Below we have a description of each library we will use. Please click the links under installation and documentation to install and learn more about each library.</p>
+    <ul>
+    <li><b>Programming Language: </b></li>
+    <br>
+    <ul>
+    <li>Python 3 - Python is a general-purpose interpreted, interactive, object-oriented, and high-level programming language. We will be using version 3.x. This can be obtained from the official Python website or through the Anaconda distribution, which contains python 3 and many useful scientific computing libraries.</li>
+    <ul>
+    <li>Python Installation: <a herf="https://www.python.org/download/releases/3.0/">Python Installation</a> or <a href="https://www.continuum.io/downloads">Anaconda Installation</a></li>
+    <li>Pip Installation: <a href="https://pip.pypa.io/en/stable/installing/">Pip Installation</a></li>
+    </ul>
+    </ul>
+    <br>
+    <li><b> Libraries: </b></li>
+    <br>
+    <ul>
+    <li>TensorFlow - TensorFlow is an open-source software for machine intelligence. It is currently a very popular choice for developing deep learning modles.</li>
+    <ul>
+    <li>Installation: <a href="https://www.tensorflow.org/install/">TensorFlow Installation</a></li>
+    <li>Documentation: <a href="https://www.tensorflow.org/get_started/get_started">TensorFlow Documentation</a></li>
+    </ul>
+    <p>Once TensorFlow is installed you will have access to TF-Slim, a lightweight library for defining, training, and evaluating complex models in TensorFlow. This makes writing TensorFlow code easier and quicker while still allowing us to see the fine details of our model and its layers.</p>
+    <br>
+    <li>Numpy - Numpy is a package for scientific computing that contains many useful operations for a multi-dimensional data structure called an ndarray (np array).</li>
+    <ul>
+    <li>Installation: <a href="https://www.scipy.org/scipylib/download.html">Numpy Installation</a></li>
+    <li>Documentation: <a href="https://docs.scipy.org/doc/numpy-dev/user/basics.html">Numpy Documentation</a></li>
+    </ul>
+    <br>
+    <li>Matplotlib -  Matplotlib, from the creators of numpy, is a plotting library that allows for custom charts like scatter plots, bar charts, line graphs, etc.</li>
+    <ul>
+    <li>Installation: <a href="http://matplotlib.org/users/installing.html">Matplotlib Installation</a></li>
+    <li>Documentation: <a href="http://matplotlib.org/2.0.0/examples/index.html">Matplotlib Documentation</a></li>
+    </ul>
+    <br>
+    <li>Scipy - Scipy, from the creators of numpy, is an alternate library for mathematics, science, and engineering.</li>
+    <ul>
+    <li>Installation: <a href="https://www.scipy.org">Scipy Installation</a></li>
+    <li>Documentation: <a href="https://docs.scipy.org/doc/scipy/reference/">Scipy Documentation</a></li>
+    </ul>
+    <br>
+    <li>Sklearn - Sklearn has efficient tools for data mining, analysis, and machine learning.</li>
+    <ul>
+    <li>Installation: <a href="http://scikit-learn.org/stable/install.html">Sklearn Installation</a></li>
+    <li>Documentation: <a href="http://scikit-learn.org/stable/documentation.html">Sklearn Documentation</a></li>
+    </ul>
+    <br>
+    <li>PIL - PIL, short for Python Imaging Library, is a powerful library to handle and manipulate images.</li>
+    <ul>
+    <li>Installation: <a href="https://pillow.readthedocs.io/en/4.0.x/installation.html">PIL Installation</a></li>
+    <li>Documentation: <a href="https://pillow.readthedocs.io/en/4.0.x/handbook/index.html">PIL Documentation</a></li>
+    </ul>
+    <br>
+
+    <li>Random - Random allows us to create pseudo-random number generators for various distributions.</li>
+    <ul>
+    <li>Installation: Installed with Python</li>
+    <li>Documentation: <a href="https://docs.python.org/2/library/random.html">Random Documentation</a></li>
+    </ul>
+    </ul>
+    </ul>
+
+    <h1>Data</h1>
+    <p>We will be using data from the Labeled Faces in the Wild (LFW) database. This database consists of more than 13,000 grayscale images of faces collected from the web. Additionally, each face has been labeled with the name of the person pictured. The data can be downloaded from <a href="http://vis-www.cs.umass.edu/lfw/">here</a>. Additionally, we can access the datasets module in sklearn and pull the data using the fetch_lfw_people function. This will return our data in a dataset object, which is a dictionary like structure. Let us now proceed to write a class and a few fuctions to read in and format our data.</p>
+
+    <p>We start by creating a class called Data_Set. In this class we take in our vector of images. In our init method we will calculate the number of samples we have in the images vector, normalize the images, and set the number of epochs completed and index of the epochs to 0. We will need the number epochs completed and the index of the epochs when we train our generative adversarial network. We will also create some getters for the number of images, number of samples, and the number of epochs completed. Finally, we will create a method called batch_next. This takes in a batch size and will perform a sequential pull of this batch size for our training data. Our class is as follows:</p> -->
+
+
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">class</span> <span style="color: #00aa00; text-decoration: underline">Data_Set</span>(<span style="color: #00aaaa">object</span>):
+    
+    <span style="color: #aaaaaa; font-style: italic">#Parameter Initialization</span>
+    <span style="color: #0000aa">def</span> <span style="color: #00aa00">__init__</span>(<span style="color: #00aaaa">self</span>, images):
+        <span style="color: #00aaaa">self</span>.num_examples = images.shape[<span style="color: #009999">0</span>]
+        <span style="color: #00aaaa">self</span>.images = np.multiply(images.astype(np.float32), <span style="color: #009999">1.0</span> / <span style="color: #009999">255.0</span>)
+        <span style="color: #00aaaa">self</span>.epochs_completed = <span style="color: #009999">0</span>
+        <span style="color: #00aaaa">self</span>.index_in_epoch = <span style="color: #009999">0</span>
+        
+    <span style="color: #aaaaaa; font-style: italic">#Getters/Setters for our class</span>
+    <span style="color: #0000aa">def</span> <span style="color: #00aa00">images</span>(<span style="color: #00aaaa">self</span>):
+        <span style="color: #0000aa">return</span> <span style="color: #00aaaa">self</span>.images
+    
+    <span style="color: #0000aa">def</span> <span style="color: #00aa00">num_examples</span>(<span style="color: #00aaaa">self</span>):
+        <span style="color: #0000aa">return</span> <span style="color: #00aaaa">self</span>.num_examples
+  
+    <span style="color: #0000aa">def</span> <span style="color: #00aa00">epochs_completed</span>(<span style="color: #00aaaa">self</span>):
+        <span style="color: #0000aa">return</span> <span style="color: #00aaaa">self</span>.epochs_completed
+
+    <span style="color: #aaaaaa; font-style: italic">#Return the next batch, used in model training</span>
+    <span style="color: #0000aa">def</span> <span style="color: #00aa00">batch_next</span>(<span style="color: #00aaaa">self</span>, batch_size):
+        start = <span style="color: #00aaaa">self</span>.index_in_epoch
+        <span style="color: #00aaaa">self</span>.index_in_epoch += batch_size
+        <span style="color: #0000aa">if</span> <span style="color: #00aaaa">self</span>.index_in_epoch &gt; <span style="color: #00aaaa">self</span>.num_examples:
+            <span style="color: #00aaaa">self</span>.epochs_completed += <span style="color: #009999">1</span>
+            perm = np.arange(<span style="color: #00aaaa">self</span>.num_examples)
+            np.random.shuffle(perm)
+            <span style="color: #00aaaa">self</span>.images = <span style="color: #00aaaa">self</span>.images[perm]
+            start = <span style="color: #009999">0</span>
+            <span style="color: #00aaaa">self</span>.index_in_epoch = batch_size
+        end = <span style="color: #00aaaa">self</span>.index_in_epoch
+        <span style="color: #0000aa">return</span> <span style="color: #00aaaa">self</span>.images[start:end], <span style="color: #00aaaa">None</span>
+</pre></div>
+
+    <p>Next, we create a function called pull_data(). This function creates an empty Data_Sets object which we create inside the function and then uses the fetch_lfw_people method from the sklearn datasets module. Within fetch_lfw_people module we use the following parameters:</p>
+    <ul>
+    <li>Slice: This provides a custom 2D slice in terms of (height, width) which allows us to extract a specific part of each of the JPEG images. We want to extract the faces in each image which corresponds to slice_ = (slice(70, 195, None), slice(70, 195, None)).</li>
+    <br>
+    <li>Resize: The Ratio used to resize the each facial picture. This value is specified as a float and defaults to 0.5. The original images are 250 x 250 pixels, but the default slice and resize arguments reduce them to 62 x 74. We, however, want our our images to be 28 x 28. To do so we can set the resize = 0.224.</li>
+    </ul>
+    <p>Once we call the fetch_lfw_people module we obtain a dataset object. We can then use the .data function to extract a vector of the facial images. We can then create the Data_Set object, which we created in the class above, by passing in our vector of the facial images. We create our pull_data function as follows:</p> -->
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">pull_data</span>():
+    <span style="color: #0000aa">class</span> <span style="color: #00aa00; text-decoration: underline">Data_Sets</span>(<span style="color: #00aaaa">object</span>):
+        <span style="color: #0000aa">pass</span>
+    data_sets = Data_Sets()
+    
+    <span style="color: #aaaaaa; font-style: italic">#Get LFW people data and resize it to 28 x 28, slice for faces </span>
+    lfw_people = fetch_lfw_people(slice_=(<span style="color: #00aaaa">slice</span>(<span style="color: #009999">70</span>, <span style="color: #009999">195</span>, <span style="color: #00aaaa">None</span>), <span style="color: #00aaaa">slice</span>(<span style="color: #009999">70</span>, <span style="color: #009999">195</span>, <span style="color: #00aaaa">None</span>)), resize=<span style="color: #009999">0.224</span>) 
+    
+    <span style="color: #aaaaaa; font-style: italic">#Create Data_Set object</span>
+    d = lfw_people.data
+    data_sets.train = Data_Set(d)
+    <span style="color: #0000aa">return</span> data_sets
+</pre></div>
+
+    <p>We can now obtain our data by doing the following:</p> -->
+
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">data = pull_data()
+</pre></div>
+
+    <p>We can check the size of our data as follows:</p> -->
+
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">print</span>(data.train.images.shape)
+&gt;&gt;&gt;
+(<span style="color: #009999">13233</span>, <span style="color: #009999">784</span>)
+</pre></div>
+
+    <p>Above, we see that we have 13,233 samples where each sample is a vector of length 784. We see that this is a flattened 28 x 28 vector as 28 x 28 = 784.</p>
+
+    <p>Now that we have our data, let us see what a sample of it looks like. To do so we write a function called display_images which takes in our data and some indices we want to display from the data. Here we use data.train.images to obtain an ndarray of normalized image values. We loop over our indices and look at the image inside data.train.images of that particular index and unnormalize it. We also reshape it into a 28 x 28 image and then use the python library PIL's imshow function to show the image. We do this for every image in the list of indices we specify. Our function is as follows:</p> -->
+
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">display_images</span>(data,indices): 
+    
+    <span style="color: #aaaaaa; font-style: italic">#Obtain the images inside data </span>
+    im_data = data.train.images
+    
+    <span style="color: #0000aa">for</span> i <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(<span style="color: #00aaaa">len</span>(indices)):
+        
+        <span style="color: #aaaaaa; font-style: italic">#Set image sizing</span>
+        %matplotlib inline
+        plt.figure(figsize=(<span style="color: #009999">1</span>,<span style="color: #009999">1</span>))
+        
+        <span style="color: #aaaaaa; font-style: italic">#Unnormalize the image and reshape it</span>
+        im = Image.fromarray(np.multiply(im_data[indices[i]],<span style="color: #009999">255.0</span>).reshape(<span style="color: #009999">28</span>,<span style="color: #009999">28</span>))
+        
+        <span style="color: #aaaaaa; font-style: italic">#Show the image </span>
+        p = plt.imshow(im)
+        plt.show(p)
+
+display_images(data,[<span style="color: #009999">4</span>,<span style="color: #009999">45</span>,<span style="color: #009999">599</span>])
+</pre></div>
+
+    <p>Once we call display_images(data,[4,45,599]) above, we see the $4^{\text{th}}, 45^{\text{th}}, \text{and}\; 599^{\text{th}}$ images in our dataset. The images are as follows:</p>
+    <center><img src = "../images/gan_samples.png" style="height:350px;"></center>
+
+
+    <h1>DCGAN architecture:</h1>
+    <p>Let us now briefly talk about Deep Convolutional Generative Adversarial Networks so that we have some background before we implement one. In 2016 Alec Radford, Luke Metz, and Soumith Chintala published <a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning With Deep Convolutional
+    Generative Adversarial Networks</a>. In computer vision tasks, convolutional networks and supervised learning has had great success and popularity. However, unsupervised learning with convolutional neural networks has recieved less attention. Deep Convolutional Generative Adversarial Networks (DCGANs) demonstrate that they are a strong candidate for unsupervised learning. The generator/discriminator pair learns a hierarchy of representations from object parts to scenes in both the generator and discriminator. Since we are working with facial image data, implementing a DCGAN is a great choice. The architecture from the paper, which we will follow, is described as:</p>
+    <ul>
+        <li>Replace any pooling layers with strided convolutions (discriminator) and fractional-strided convolutions (generator)</li>
+        <li>Use batchnorm in both the generator and the discriminator</li>
+        <li>Remove fully connected hidden layers for deeper architectures</li>
+        <li>Use ReLU activation in generator for all layers except for the output, which uses Tanh</li>
+        <li>Use LeakyReLU activation in the discriminator for all layers</li>
+    </ul>
+
+    <h1>Leaky Rectified Linear Unit</h1>
+    <p>Before we move on to creating our generator and discriminator let us first construct a leaky rectified linear unit layer. When we use GANs we want to avoid sparse gradients to prevent suffering in terms of GAN stability. This means we should stear clear from ReLU and MaxPool layers. Instead we can use this leaky rectified linear unit layer. Let us create a function called lrelu that takes in x, a leak value, and the name "lrelu". Inside we use tf.variable_scope("lrelu") and set f1 to 0.5 * (1 + leak) and f2 to 0.5 * (1 - leak). We then return f1 * x + f2 * abs(x). We will use the leaky rectified linear unit layer in our discriminator as noted in the DCGAN architecture above. We build our function as follows:</p> -->
+
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">lrelu</span>(x, leak=<span style="color: #009999">0.2</span>, name=<span style="color: #aa5500">&quot;lrelu&quot;</span>):
+    <span style="color: #0000aa">with</span> tf.variable_scope(name):
+        f1 = <span style="color: #009999">0.5</span> * (<span style="color: #009999">1</span> + leak)
+        f2 = <span style="color: #009999">0.5</span> * (<span style="color: #009999">1</span> - leak)
+        <span style="color: #0000aa">return</span> f1 * x + f2 * <span style="color: #00aaaa">abs</span>(x)
+</pre></div>
+
+    <h1>Generator</h1>
+    <p>Let us now construct our generator. The architecture looks as follows:</p>
+    <center><img src="../images/gen.png"></center>
+
+    <p>Above we see that we have our z input (uniformly distributed random numbers). We will create four deconvolutional layers. Each layer will have batch normalization. The first three layers will use the rectified linear unit (RELU) activation function, while the fourth deconvolutional layer will use the tanh activation function as specified in the paper. We will then output an image G(z) with dimensions 32 x 32. Our architecure for the generator will look as follows:</p>
+    <ul>
+        <li>Fully Connected Layer</li>
+        <li>Reshape</li>
+        <li>Deconvolutional Layer 1 - batch normalization, relu activation</li>
+        <li>Deconvolutional Layer 2 - batch normalization, relu activation</li>
+        <li>Deconvolutional Layer 3 - batch normalization, relu activation</li>
+        <li>Deconvolutional Layer 4 - batch normalization, tanh activation</li>
+    </ul>
+    <p>All in all, our generator will take in a vector consisting of random numbers from a uniform distribution, pass through four fractionally-strided convolutions (called deconvolutions), and then output an image with shape 32 x 32. We construct our generator model, called generator, with an input called z_shp. This is the shape of our z in the above architecture description. Our function is as follows:</p> -->
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">generator</span>(z_shp):
+    
+    <span style="color: #aaaaaa; font-style: italic">#Commonly Used Variables</span>
+    PADDING = <span style="color: #aa5500">&quot;SAME&quot;</span>
+    STRIDE = [<span style="color: #009999">2</span>,<span style="color: #009999">2</span>]
+    
+    <span style="color: #aaaaaa; font-style: italic">#Our first dense (fully connected) layer</span>
+    g1_dense = slim.fully_connected(z_shp,<span style="color: #009999">4</span>*<span style="color: #009999">4</span>*<span style="color: #009999">256</span>,normalizer_fn=slim.batch_norm,\
+        activation_fn=tf.nn.relu,scope=<span style="color: #aa5500">&#39;g1_dense&#39;</span>,weights_initializer=initializer)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Reshape</span>
+    g1_dense_reshape = tf.reshape(g1_dense,[-<span style="color: #009999">1</span>,<span style="color: #009999">4</span>,<span style="color: #009999">4</span>,<span style="color: #009999">256</span>])
+    
+    <span style="color: #aaaaaa; font-style: italic">#Dconv Layer 1, batch normalization, relu activation</span>
+    g2_dconv = slim.convolution2d_transpose(\
+        g1_dense_reshape,num_outputs=<span style="color: #009999">64</span>,kernel_size=[<span style="color: #009999">5</span>,<span style="color: #009999">5</span>],stride=STRIDE,\
+        padding=PADDING,normalizer_fn=slim.batch_norm,\
+        activation_fn=tf.nn.relu,scope=<span style="color: #aa5500">&#39;g2_dconv&#39;</span>, weights_initializer=initializer)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Dconv Layer 2, batch normalization, relu activation</span>
+    g3_dconv = slim.convolution2d_transpose(\
+        g2_dconv,num_outputs=<span style="color: #009999">32</span>,kernel_size=[<span style="color: #009999">5</span>,<span style="color: #009999">5</span>],stride=STRIDE,\
+        padding=PADDING,normalizer_fn=slim.batch_norm,\
+        activation_fn=tf.nn.relu,scope=<span style="color: #aa5500">&#39;g3_dconv&#39;</span>, weights_initializer=initializer)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Dconv Layer 3, batch normalization, relu activation</span>
+    g4_dconv = slim.convolution2d_transpose(\
+        g3_dconv,num_outputs=<span style="color: #009999">16</span>,kernel_size=[<span style="color: #009999">5</span>,<span style="color: #009999">5</span>],stride=STRIDE,\
+        padding=PADDING,normalizer_fn=slim.batch_norm,\
+        activation_fn=tf.nn.relu,scope=<span style="color: #aa5500">&#39;g4_dconv&#39;</span>, weights_initializer=initializer)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Dconv Layer 4, batch normalization, tanh activation</span>
+    g5_dconv = slim.convolution2d_transpose(\
+        g4_dconv,num_outputs=<span style="color: #009999">1</span>,kernel_size=[<span style="color: #009999">32</span>,<span style="color: #009999">32</span>],padding=PADDING,\
+        biases_initializer=<span style="color: #00aaaa">None</span>,activation_fn=tf.nn.tanh,\
+        scope=<span style="color: #aa5500">&#39;g5_dconv&#39;</span>, weights_initializer=initializer)
+    
+    <span style="color: #0000aa">return</span> g5_dconv
+</pre></div>
+
+<h1>Discriminator</h1>
+<p>Now that we have our generator to generate synthetic images, let us now create our discriminator. Our discriminator achitecture is as follows:</p>
+<center><img src="../images/disc.png"></center> -->
+<!--<ul>
+<li>Convolutional Layer 1 - leaky relu activation</li>
+<li>Convolutional Layer 2 - leaky relu activation</li>
+<li>Convolutional Layer 3 - leaky relu activation</li>
+<li>Fully Connected Layer  - Sigmoid activation</li>
+</ul> -->
+<!--<p>Here we will input a 32 x 32 image and pass it through three convolutional layers that have a leaky rectified linear unit activation. We will then pass through a fully connected layer with a sigmoid activation function and will return a single valued probability representing whether the generated image is a "real" image or a "fake" image. We create the discriminator as follows:</p> -->
+
+<!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">discriminator</span>(bottom, reuse=<span style="color: #00aaaa">False</span>):
+    PADDING = <span style="color: #aa5500">&quot;SAME&quot;</span>
+    STRIDE = [<span style="color: #009999">2</span>,<span style="color: #009999">2</span>]
+    
+    <span style="color: #aaaaaa; font-style: italic">#Conv Layer 1, No batch normalization, leaky relu activation</span>
+    d1_conv = slim.convolution2d(bottom,<span style="color: #009999">16</span>,[<span style="color: #009999">4</span>,<span style="color: #009999">4</span>],stride=STRIDE,padding=PADDING,\
+        biases_initializer=<span style="color: #00aaaa">None</span>,activation_fn=lrelu,\
+        reuse=reuse,scope=<span style="color: #aa5500">&#39;d1_conv&#39;</span>,weights_initializer=initializer)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Conv Layer 2, batch normalization, leaky relu activation</span>
+    d2_conv = slim.convolution2d(d1_conv,<span style="color: #009999">32</span>,[<span style="color: #009999">4</span>,<span style="color: #009999">4</span>],stride=STRIDE,padding=PADDING,\
+        normalizer_fn=slim.batch_norm,activation_fn=lrelu,\
+        reuse=reuse,scope=<span style="color: #aa5500">&#39;d2_conv&#39;</span>, weights_initializer=initializer)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Conv Layer 3, batch normalization, leaky relu activation</span>
+    d3_conv = slim.convolution2d(d2_conv,<span style="color: #009999">64</span>,[<span style="color: #009999">4</span>,<span style="color: #009999">4</span>],stride=STRIDE,padding=PADDING,\
+        normalizer_fn=slim.batch_norm,activation_fn=lrelu,\
+        reuse=reuse,scope=<span style="color: #aa5500">&#39;d3_conv&#39;</span>,weights_initializer=initializer)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Dense Layer (Fully connected), sigmoid activation</span>
+    d4_dense = slim.fully_connected(slim.flatten(d3_conv),<span style="color: #009999">1</span>,activation_fn=tf.nn.sigmoid,\
+        reuse=reuse,scope=<span style="color: #aa5500">&#39;d4_output&#39;</span>, weights_initializer=initializer)
+    
+    <span style="color: #0000aa">return</span> d4_dense
+</pre></div>
+
+<h1>DCGAN Construction</h1>
+<p>Now that we have our generator and discriminator we can now create our deep convolutional generative adversarial network. We will create a variable called z_size which will be the size of the z vector used for our generator. We will then initialize all weights for our network. We do so here because we want to initialize the same weights. If we pass this into each weights_initializer parameter in our tf.slim code above we might be assigned different weights. We then create an input for the generator and discriminator and create the images for the random vectors and probabilites for the real images. We can then create the optimization objective and then apply gradient descent. We create our DCGAN model as follows:</p> -->
+
+
+<!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">tf.reset_default_graph()
+
+z_size = <span style="color: #009999">100</span>
+
+<span style="color: #aaaaaa; font-style: italic">#Initialize Network weights </span>
+initializer = tf.truncated_normal_initializer(stddev=<span style="color: #009999">0.02</span>)
+
+<span style="color: #aaaaaa; font-style: italic">#Input for Generator </span>
+z_in = tf.placeholder(shape=[<span style="color: #00aaaa">None</span>,z_size],dtype=tf.float32) 
+
+<span style="color: #aaaaaa; font-style: italic">#Input for Discriminator</span>
+real_in = tf.placeholder(shape=[<span style="color: #00aaaa">None</span>,<span style="color: #009999">32</span>,<span style="color: #009999">32</span>,<span style="color: #009999">1</span>],dtype=tf.float32)
+
+<span style="color: #aaaaaa; font-style: italic">#Creating Images for ranom vectors of size z_in</span>
+Gz = generator(z_in)
+
+<span style="color: #aaaaaa; font-style: italic">#Probabilities for real images</span>
+Dx = discriminator(real_in)
+
+<span style="color: #aaaaaa; font-style: italic">#Probabilities for generator images</span>
+Dg = discriminator(Gz,reuse=<span style="color: #00aaaa">True</span>)
+
+<span style="color: #aaaaaa; font-style: italic">#Optimize the discriminator and the generator</span>
+d_log1 = tf.log(Dx)
+d_log2 = tf.log(<span style="color: #009999">1.</span>-Dg)
+g_log = tf.log(Dg)
+d_loss = -tf.reduce_mean(d_log1 + d_log2) 
+g_loss = -tf.reduce_mean(g_log) 
+
+tvars = tf.trainable_variables()
+
+<span style="color: #aaaaaa; font-style: italic">#Use the Adam Optimizers for discriminator and generator </span>
+LR = <span style="color: #009999">0.0002</span>
+BTA = <span style="color: #009999">0.5</span>
+trainerD = tf.train.AdamOptimizer(learning_rate=LR,beta1=BTA)
+trainerG = tf.train.AdamOptimizer(learning_rate=LR,beta1=BTA)
+
+<span style="color: #aaaaaa; font-style: italic">#Gradients for discriminator and generator</span>
+gradients_discriminator = trainerD.compute_gradients(d_loss,tvars[<span style="color: #009999">9</span>:]) 
+gradients_generator = trainerG.compute_gradients(g_loss,tvars[<span style="color: #009999">0</span>:<span style="color: #009999">9</span>]) 
+
+<span style="color: #aaaaaa; font-style: italic">#Apply the gradients</span>
+update_D = trainerD.apply_gradients(gradients_discriminator)
+update_G = trainerG.apply_gradients(gradients_generator)
+</pre></div>
+
+<h1>Saving Generated Images</h1>
+<p>Our GAN will create synthetic images during training. Let us now write a function called save_generated_images to save our generated images. Here we will take in a vector of images, a size, and a path to save them. We will create a vector of zeros that is of size image height x width multiplied by the size we pass in (for instance size = [6,6]). We will then extract the images we want to save and return a block of images (6 x 6) so we can see how our model improves over time. We do so as follows:</p> -->
+
+<!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">save_generated_images</span>(images,size,image_path): 
+    images = (images+<span style="color: #009999">1.</span>)/<span style="color: #009999">2.</span>
+    height = images.shape[<span style="color: #009999">1</span>]
+    width = images.shape[<span style="color: #009999">2</span>]
+    img = np.zeros((height * size[<span style="color: #009999">0</span>], width * size[<span style="color: #009999">1</span>]))
+    <span style="color: #0000aa">for</span> idx, image <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(images):
+        a = idx % size[<span style="color: #009999">1</span>]
+        b = idx // size[<span style="color: #009999">1</span>]
+        img[b*height:b*height+height, a*width:a*width+width] = image
+    sve = scipy.misc.imsave(image_path,img)
+    <span style="color: #0000aa">return</span> sve
+</pre></div>
+
+    <h1>DCGAN Training</h1>
+    <p>Let us now train our network on our machine ( I am using a retina macbook pro with 8gb of ram). Since we are not using a GPU right now (we will do so in the next section), we will use 5000 iterations and a batch size of 128. Here, we will choose a sample batch from our facial image data using the class function batch_next and shape it into a 32 x 32 image. We will then generate a random batch, z, and update the generator and discriminator. Every 15 iterations we will calculate our loss for both the generator and discriminator and plot them on an updating plot. We will also save some sample generated images (36 sample generated images in a 6 x 6 grid) from the generator at this stage. We will save these images into a directory called facial_figs. Every 1000 iterations we will save our model attributes into a directory called facial_models. We train our model as follows:</p> -->
+
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #aaaaaa; font-style: italic">#size setups</span>
+batch_size = <span style="color: #009999">128</span>
+iterations = <span style="color: #009999">5000</span> 
+
+<span style="color: #aaaaaa; font-style: italic">#tf setup</span>
+init = tf.global_variables_initializer()
+saver = tf.train.Saver()
+
+<span style="color: #aaaaaa; font-style: italic">#plot setup</span>
+plt_g = np.array([])
+plt_d = np.array([])
+plt_x = np.array([])
+
+<span style="color: #0000aa">with</span> tf.Session() <span style="color: #0000aa">as</span> sess:  
+    sess.run(init)
+    <span style="color: #0000aa">for</span> i <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(iterations):
+        <span style="color: #0000aa">print</span>(<span style="color: #aa5500">&quot;Progress: &quot;</span>,i,<span style="color: #aa5500">&quot;/&quot;</span>,iterations)
+    
+        <span style="color: #aaaaaa; font-style: italic">#Choose sample batch from data </span>
+        xs,xt = data.train.batch_next(batch_size)
+        
+        <span style="color: #aaaaaa; font-style: italic">#Make sure our data is between (-1,1)</span>
+        xs = np.lib.pad(((np.reshape(xs,[batch_size,<span style="color: #009999">28</span>,<span style="color: #009999">28</span>,<span style="color: #009999">1</span>]) - <span style="color: #009999">0.5</span>) * <span style="color: #009999">2.0</span>),((<span style="color: #009999">0</span>,<span style="color: #009999">0</span>),(<span style="color: #009999">2</span>,<span style="color: #009999">2</span>),(<span style="color: #009999">2</span>,<span style="color: #009999">2</span>),(<span style="color: #009999">0</span>,<span style="color: #009999">0</span>)),<span style="color: #aa5500">&#39;constant&#39;</span>, constant_values=(-<span style="color: #009999">1</span>, -<span style="color: #009999">1</span>))
+        
+        <span style="color: #aaaaaa; font-style: italic">#Updating Discriminator Once and Generator Twice</span>
+        random_z_batch = np.random.uniform(-<span style="color: #009999">1.0</span>,<span style="color: #009999">1.0</span>,size=[batch_size,z_size]).astype(np.float32) <span style="color: #aaaaaa; font-style: italic">#Generate a random z batch</span>
+        _,dLoss = sess.run([update_D,d_loss],feed_dict={z_in:random_z_batch,real_in:xs})
+        _,gLoss = sess.run([update_G,g_loss],feed_dict={z_in:random_z_batch}) 
+        _,gLoss = sess.run([update_G,g_loss],feed_dict={z_in:random_z_batch})
+        
+
+        <span style="color: #aaaaaa; font-style: italic">#Training Stats</span>
+        <span style="color: #0000aa">if</span> i % <span style="color: #009999">15</span> == <span style="color: #009999">0</span>:
+            <span style="color: #aaaaaa; font-style: italic">#Plot our generator loss and discriminator loss</span>
+            <span style="color: #0000aa">print</span>(<span style="color: #aa5500">&quot;Gen Loss: &quot;</span> + <span style="color: #00aaaa">str</span>(gLoss) + <span style="color: #aa5500">&quot; Disc Loss: &quot;</span> + <span style="color: #00aaaa">str</span>(dLoss))
+            plt_g = np.append(plt_g,<span style="color: #00aaaa">float</span>(gLoss))
+            plt_d = np.append(plt_d,<span style="color: #00aaaa">float</span>(dLoss))
+            plt_x = np.append(plt_x,i)
+            plt.gca().cla() 
+            plt.plot(plt_x,plt_g,<span style="color: #aa5500">&#39;r--&#39;</span>,label=<span style="color: #aa5500">&#39;gen loss&#39;</span>)
+            plt.plot(plt_x,plt_d,<span style="color: #aa5500">&#39;g--&#39;</span>,label=<span style="color: #aa5500">&#39;disc loss&#39;</span>)
+            plt.xlabel(<span style="color: #aa5500">&#39;iteration&#39;</span>)
+            plt.ylabel(<span style="color: #aa5500">&#39;loss&#39;</span>)
+            plt.title(<span style="color: #aa5500">&#39;Loss vs iteration&#39;</span>)
+            plt.legend()
+            display.clear_output(wait=<span style="color: #00aaaa">True</span>)
+            display.display(plt.gcf())       
+            
+            <span style="color: #aaaaaa; font-style: italic">#Get sample images from the generator</span>
+            z2 = np.random.uniform(-<span style="color: #009999">1.0</span>,<span style="color: #009999">1.0</span>,size=[batch_size,z_size]).astype(np.float32) 
+            newZ = sess.run(Gz,feed_dict={z_in:z2})
+            
+            <span style="color: #aaaaaa; font-style: italic">#Save our generated images </span>
+            <span style="color: #0000aa">if</span> <span style="color: #0000aa">not</span> os.path.exists(<span style="color: #aa5500">&#39;./facial_figs&#39;</span>):
+                os.makedirs(<span style="color: #aa5500">&#39;./facial_figs&#39;</span>)
+            save_generated_images(np.reshape(newZ[<span style="color: #009999">0</span>:<span style="color: #009999">36</span>],[<span style="color: #009999">36</span>,<span style="color: #009999">32</span>,<span style="color: #009999">32</span>]),[<span style="color: #009999">6</span>,<span style="color: #009999">6</span>],<span style="color: #aa5500">&#39;./facial_figs/fig&#39;</span>+<span style="color: #00aaaa">str</span>(i)+<span style="color: #aa5500">&#39;.png&#39;</span>)
+        
+        <span style="color: #aaaaaa; font-style: italic">#Save our model every 1000 iterations</span>
+        <span style="color: #0000aa">if</span> i % <span style="color: #009999">1000</span> == <span style="color: #009999">0</span> <span style="color: #0000aa">and</span> i != <span style="color: #009999">0</span>:
+            <span style="color: #0000aa">if</span> <span style="color: #0000aa">not</span> os.path.exists(<span style="color: #aa5500">&#39;./facial_models&#39;</span>):
+                os.makedirs(<span style="color: #aa5500">&#39;./facial_models&#39;</span>)
+            saver.save(sess,<span style="color: #aa5500">&#39;./facial_models/model-&#39;</span>+<span style="color: #00aaaa">str</span>(i)+<span style="color: #aa5500">&#39;.cptk&#39;</span>)
+            <span style="color: #0000aa">print</span>(<span style="color: #aa5500">&quot;Saved Model&quot;</span>)
+</pre></div>
+
+
+    <p>The code above should take approximately 8 hours using the CPU on a retina Macbook Pro with 8gb of ram. When the model finished our plot of the loss function against the number of iterations looked as follows:</p>
+
+    <center><img src="../images/loss.png" style="width:400px; height:300px"></center>
+
+    <p>We see that our generator's loss was initially lower than the discriminator's loss meaning the generator was generating images that was fooling the discriminator. However, the discriminator soon learned to catch these fake images and it's loss dropped lower than the discriminators. Soon, the generator started generating better quality images that fooled the discriminator. We see that the generator and discriminator loss functions started to stabalize at about 1000 iterations with the generator's loss being about 0.65 and the discriminator's loss being about 1.40.</p>
+
+    <h1>DCGAN Generator Image Samples</h1>
+    <p>Below are some sample images that were generated during training:</p>
+
+    <style>
+    .square{ 
+    padding-bottom: 30%; 
+    height: 0;
+    width:42%; 
+    margin:1%; 
+    float:left; 
+    display:block;
+    }
+    .fblogo {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 30px; 
+    }
+    #images{
+    text-align:center;
+    }
+    </style>
+
+    <div id="images">
+    <img class="fblogo" src="../images/fig4170.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig4860.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig4875.png" style="width:150px; height:150px">
+    </div>
+
+    <div id="images">
+    <img class="fblogo" src="../images/fig4185.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig4200.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig4215.png" style="width:150px; height:150px">
+    </div>
+
+    <div id="images">
+    <img class="fblogo" src="../images/fig4230.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig4920.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig4950.png" style="width:150px; height:150px">
+    </div>
+
+    <p>All of the above images were from iterations 4000 - 5000. We can clearly see that facial images have started to form and we see clearly defined facial features like eyes, nose, mouth. The images are still a little blurry, but we should expect this after a low number of iterations. Let's take a look at some of the earlier images generated earlier in the training process:</p>
+
+    <div id="images">
+    <img class="fblogo" src="../images/fig0.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig360.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig555.png" style="width:150px; height:150px">
+    </div>
+
+    <div id="images">
+    <img class="fblogo" src="../images/fig1200.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig1500.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig1635.png" style="width:150px; height:150px">
+    </div>
+
+    <div id="images">
+    <img class="fblogo" src="../images/fig1770.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig2805.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/fig3000.png" style="width:150px; height:150px">
+    </div>
+
+    <p>We see that our generator started off generating low quality pixelated images, but started to generate images that looked more and more like faces, hence fooling the discriminator. We can find a timelapse gif of the training process below:</p>
+
+    <center><img src="../images/AJL_GAN_training_LFW.gif"></center>
+
+    <h1>Query Our DCGAN</h1>
+    <p>Now that we have a trained model, where we can clearly see facial images, let us write a function to query new facial images. We first load in our saved model from the facial_models directory. Then, we pass in a vector of random uniformly distributed numbers of the batch size specified previously to the generator and generate a set of 6 x 6 images, which will be saved in a directory called synthetic_faces. We wrap the random number process and image generation in a for loop so we can repeat this k times. Our code is as follows:</p> -->
+
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">batch_size_sample = <span style="color: #009999">36</span>
+num_img = <span style="color: #009999">10</span>
+init = tf.initialize_all_variables()
+saver = tf.train.Saver()
+<span style="color: #0000aa">with</span> tf.Session() <span style="color: #0000aa">as</span> sess:  
+    sess.run(init)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Load previos Model and weights</span>
+    ckpt = tf.train.get_checkpoint_state(<span style="color: #aa5500">&#39;./facial_models&#39;</span>)
+    saver.restore(sess,ckpt.model_checkpoint_path)
+    
+    <span style="color: #aaaaaa; font-style: italic">#Generate 10 synthetic facial iamges </span>
+    <span style="color: #0000aa">for</span> k <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(num_img):
+        <span style="color: #aaaaaa; font-style: italic">#Generate random uniform to generate synthetic images</span>
+        rand_z = np.random.uniform(-<span style="color: #009999">1.0</span>,<span style="color: #009999">1.0</span>,size=[batch_size_sample,z_size]).astype(np.float32) 
+        newZ = sess.run(Gz,feed_dict={z_in:rand_z}) 
+    
+        <span style="color: #aaaaaa; font-style: italic">#Save synthetic image</span>
+        <span style="color: #0000aa">if</span> <span style="color: #0000aa">not</span> os.path.exists(<span style="color: #aa5500">&#39;./synthetic_faces&#39;</span>):
+            os.makedirs(<span style="color: #aa5500">&#39;./synthetic_faces&#39;</span>)
+        save_generated_images(np.reshape(newZ[<span style="color: #009999">0</span>:batch_size_sample],[<span style="color: #009999">36</span>,<span style="color: #009999">32</span>,<span style="color: #009999">32</span>]),[<span style="color: #009999">6</span>,<span style="color: #009999">6</span>],<span style="color: #aa5500">&#39;synthetic_faces/synthetic_face&#39;</span>+<span style="color: #00aaaa">str</span>(k)+<span style="color: #aa5500">&#39;.png&#39;</span>)
+</pre></div>
+
+    <p>Let us now take a look at some of the images we generated:</p>
+
+    <div id="images">
+    <img class="fblogo" src="../images/synthetic_face8.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/synthetic_face9.png" style="width:150px; height:150px">
+    </div>
+
+    <p>Again, we can clearly see facial images produced by our generator.</p>
+
+    <h1>DCGAN On A GPU</h1>
+
+    <p>We see that we had good success in generating facial images by training 5,000 iterations over 8 hours on our machine's CPU. Using a GPU will allow us to train many more iterations in much less time. Amazon Web Services (AWS) offers a low cost hourly charge to run code on their powerful machines. We will make use of the p2.8xlarge machine for training our model. This machine has 8 GPUs, 32 vCPU, 488 GiB of memory, 19968 parallel processing cores, 96 GiB of GPU memory, and 10 Gigabit network performance. This is a very powerful machine and at the cost of $\$7.20$ per hour we can train for 50,000 iterations in about 85 minutes. This might sound expensive, but we are going to use AWS spot pricing. Here, the current spot price (always changing) is $\$0.905$ per hour. So, for less than $\$2$ we can train our DCGAN model on a high powered machine packed with multiple GPUs for 50,000 iterations. To do so, we need to enable our TensorFlow code to use a GPU. Now, when we create our DCGAN model by combining the generator and discriminator, we need to set DEVICE = '/gpu:0' and wrap our code inside with tf.device(DEVICE). We make the change as follows:</p> -->
+
+    <!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">DEVICE=<span style="color: #aa5500">&#39;/gpu:0&#39;</span>
+<span style="color: #0000aa">with</span> tf.device(DEVICE):
+    tf.reset_default_graph()
+
+    z_size = <span style="color: #009999">100</span>
+
+    <span style="color: #aaaaaa; font-style: italic">#Initialize Network weights </span>
+    initializer = tf.truncated_normal_initializer(stddev=<span style="color: #009999">0.02</span>)
+
+    <span style="color: #aaaaaa; font-style: italic">#Input for Generator </span>
+    z_in = tf.placeholder(shape=[<span style="color: #00aaaa">None</span>,z_size],dtype=tf.float32) 
+
+    <span style="color: #aaaaaa; font-style: italic">#Input for Discriminator</span>
+    real_in = tf.placeholder(shape=[<span style="color: #00aaaa">None</span>,<span style="color: #009999">32</span>,<span style="color: #009999">32</span>,<span style="color: #009999">1</span>],dtype=tf.float32)
+
+    <span style="color: #aaaaaa; font-style: italic">#Creating Images for ranom vectors of size z_in</span>
+    Gz = generator(z_in)
+
+    <span style="color: #aaaaaa; font-style: italic">#Probabilities for real images</span>
+    Dx = discriminator(real_in)
+
+    <span style="color: #aaaaaa; font-style: italic">#Probabilities for generator images</span>
+    Dg = discriminator(Gz,reuse=<span style="color: #00aaaa">True</span>)
+
+    <span style="color: #aaaaaa; font-style: italic">#Optimize the discriminator and the generator</span>
+    d_log1 = tf.log(Dx)
+    d_log2 = tf.log(<span style="color: #009999">1.</span>-Dg)
+    g_log = tf.log(Dg)
+    d_loss = -tf.reduce_mean(d_log1 + d_log2) 
+    g_loss = -tf.reduce_mean(g_log) 
+
+    tvars = tf.trainable_variables()
+
+    <span style="color: #aaaaaa; font-style: italic">#Use the Adam Optimizers for discriminator and generator </span>
+    LR = <span style="color: #009999">0.0002</span>
+    BTA = <span style="color: #009999">0.5</span>
+    trainerD = tf.train.AdamOptimizer(learning_rate=LR,beta1=BTA)
+    trainerG = tf.train.AdamOptimizer(learning_rate=LR,beta1=BTA)
+
+    <span style="color: #aaaaaa; font-style: italic">#Gradients for discriminator and generator</span>
+    gradients_discriminator = trainerD.compute_gradients(d_loss,tvars[<span style="color: #009999">9</span>:]) 
+    gradients_generator = trainerG.compute_gradients(g_loss,tvars[<span style="color: #009999">0</span>:<span style="color: #009999">9</span>]) 
+
+    <span style="color: #aaaaaa; font-style: italic">#Apply the gradients</span>
+    update_D = trainerD.apply_gradients(gradients_discriminator)
+    update_G = trainerG.apply_gradients(gradients_generator)
+</pre></div>
+
+<p>We can now apply our previous code, shown below, to start training the model on the AWS instance. We will save all generated images and model parameters to the directories gpu_facial_figs and gpu_facial_models.</p> -->
+
+<!-- HTML generated using hilite.me --><!--<div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #aaaaaa; font-style: italic">#size setups</span>
+batch_size = <span style="color: #009999">128</span>
+iterations = <span style="color: #009999">50000</span> 
+
+<span style="color: #aaaaaa; font-style: italic">#tf setup</span>
+init = tf.global_variables_initializer()
+saver = tf.train.Saver()
+
+<span style="color: #aaaaaa; font-style: italic">#plot setup</span>
+plt_g = np.array([])
+plt_d = np.array([])
+plt_x = np.array([])
+
+<span style="color: #0000aa">with</span> tf.Session() <span style="color: #0000aa">as</span> sess:  
+    sess.run(init)
+    <span style="color: #0000aa">for</span> i <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(iterations):
+        <span style="color: #0000aa">print</span>(<span style="color: #aa5500">&quot;Progress: &quot;</span>,i,<span style="color: #aa5500">&quot;/&quot;</span>,iterations)
+    
+        <span style="color: #aaaaaa; font-style: italic">#Choose sample batch from data </span>
+        xs,xt = data.train.batch_next(batch_size)
+        
+        <span style="color: #aaaaaa; font-style: italic">#Make sure our data is between (-1,1)</span>
+        xs = np.lib.pad(((np.reshape(xs,[batch_size,<span style="color: #009999">28</span>,<span style="color: #009999">28</span>,<span style="color: #009999">1</span>]) - <span style="color: #009999">0.5</span>) * <span style="color: #009999">2.0</span>),((<span style="color: #009999">0</span>,<span style="color: #009999">0</span>),(<span style="color: #009999">2</span>,<span style="color: #009999">2</span>),(<span style="color: #009999">2</span>,<span style="color: #009999">2</span>),(<span style="color: #009999">0</span>,<span style="color: #009999">0</span>)),<span style="color: #aa5500">&#39;constant&#39;</span>, constant_values=(-<span style="color: #009999">1</span>, -<span style="color: #009999">1</span>))
+        
+        <span style="color: #aaaaaa; font-style: italic">#Updating Discriminator Once and Generator Twice</span>
+        random_z_batch = np.random.uniform(-<span style="color: #009999">1.0</span>,<span style="color: #009999">1.0</span>,size=[batch_size,z_size]).astype(np.float32) <span style="color: #aaaaaa; font-style: italic">#Generate a random z batch</span>
+        _,dLoss = sess.run([update_D,d_loss],feed_dict={z_in:random_z_batch,real_in:xs})
+        _,gLoss = sess.run([update_G,g_loss],feed_dict={z_in:random_z_batch}) 
+        _,gLoss = sess.run([update_G,g_loss],feed_dict={z_in:random_z_batch})
+        
+
+        <span style="color: #aaaaaa; font-style: italic">#Training Stats</span>
+        <span style="color: #0000aa">if</span> i % <span style="color: #009999">15</span> == <span style="color: #009999">0</span>:
+            <span style="color: #aaaaaa; font-style: italic">#Plot our generator loss and discriminator loss</span>
+            <span style="color: #0000aa">print</span>(<span style="color: #aa5500">&quot;Gen Loss: &quot;</span> + <span style="color: #00aaaa">str</span>(gLoss) + <span style="color: #aa5500">&quot; Disc Loss: &quot;</span> + <span style="color: #00aaaa">str</span>(dLoss))
+            plt_g = np.append(plt_g,<span style="color: #00aaaa">float</span>(gLoss))
+            plt_d = np.append(plt_d,<span style="color: #00aaaa">float</span>(dLoss))
+            plt_x = np.append(plt_x,i)
+            plt.gca().cla() 
+            plt.plot(plt_x,plt_g,<span style="color: #aa5500">&#39;r--&#39;</span>,label=<span style="color: #aa5500">&#39;gen loss&#39;</span>)
+            plt.plot(plt_x,plt_d,<span style="color: #aa5500">&#39;g--&#39;</span>,label=<span style="color: #aa5500">&#39;disc loss&#39;</span>)
+            plt.xlabel(<span style="color: #aa5500">&#39;iteration&#39;</span>)
+            plt.ylabel(<span style="color: #aa5500">&#39;loss&#39;</span>)
+            plt.title(<span style="color: #aa5500">&#39;Loss vs iteration&#39;</span>)
+            plt.legend()
+            display.clear_output(wait=<span style="color: #00aaaa">True</span>)
+            display.display(plt.gcf())       
+            
+            <span style="color: #aaaaaa; font-style: italic">#Get sample images from the generator</span>
+            z2 = np.random.uniform(-<span style="color: #009999">1.0</span>,<span style="color: #009999">1.0</span>,size=[batch_size,z_size]).astype(np.float32) 
+            newZ = sess.run(Gz,feed_dict={z_in:z2})
+            
+            <span style="color: #aaaaaa; font-style: italic">#Save our generated images </span>
+            <span style="color: #0000aa">if</span> <span style="color: #0000aa">not</span> os.path.exists(<span style="color: #aa5500">&#39;./gpu_facial_figs&#39;</span>):
+                os.makedirs(<span style="color: #aa5500">&#39;./gpu_facial_figs&#39;</span>)
+            save_generated_images(np.reshape(newZ[<span style="color: #009999">0</span>:<span style="color: #009999">36</span>],[<span style="color: #009999">36</span>,<span style="color: #009999">32</span>,<span style="color: #009999">32</span>]),[<span style="color: #009999">6</span>,<span style="color: #009999">6</span>],<span style="color: #aa5500">&#39;./gpu_facial_figs/fig&#39;</span>+<span style="color: #00aaaa">str</span>(i)+<span style="color: #aa5500">&#39;.png&#39;</span>)
+        
+        <span style="color: #aaaaaa; font-style: italic">#Save our model every 1000 iterations</span>
+        <span style="color: #0000aa">if</span> i % <span style="color: #009999">1000</span> == <span style="color: #009999">0</span> <span style="color: #0000aa">and</span> i != <span style="color: #009999">0</span>:
+            <span style="color: #0000aa">if</span> <span style="color: #0000aa">not</span> os.path.exists(<span style="color: #aa5500">&#39;./gpu_facial_models&#39;</span>):
+                os.makedirs(<span style="color: #aa5500">&#39;./gpu_facial_models&#39;</span>)
+            saver.save(sess,<span style="color: #aa5500">&#39;./gpu_facial_models/model-&#39;</span>+<span style="color: #00aaaa">str</span>(i)+<span style="color: #aa5500">&#39;.cptk&#39;</span>)
+            <span style="color: #0000aa">print</span>(<span style="color: #aa5500">&quot;Saved Model&quot;</span>)
+</pre></div>
+
+    <p>Now, we have over 50,000 generated images during training. Let us take a look at a couple of the images generated during training:</p> 
+
+    <div id="images">
+    <img class="fblogo" src="../images/gpu_1.png" style="width:150px; height:150px">
+    <img class="fblogo" src="../images/gpu_2.png" style="width:150px; height:150px">
+    </div>
+
+    <p>Let us also look at a sample video of the training process. We only show a sample as there are too many images and the video file becomes too large to upload:</p>
+
+    <center><video  controls="controls" width="300" height="300" src="../images/GPU_gan_training.mov"></video></center>
+
+    <p>After training on the GPU for 50,000 iterations, our images look much more realistic.</p>
+
+    <h1>Code</h1>
+    <p>We have successfully built a DCGAN model and generated synthetic facial images on both a CPU and GPU. All code for this tutorial is available for download in an iPython format <a href="DCGAN_code.zip">here</a>.</p> -->
+
+    <h1>References:</h1>
+    <ul>
+    <!--<li><a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning With Deep Convolutional Generative Adversarial Networks</a></li>
+    <li><a href="http://blog.aylien.com/introduction-generative-adversarial-networks-code-tensorflow/">Introduction to GANs with Tensorflow</a></li>
+    <li><a href="https://medium.com/@awjuliani/generative-adversarial-networks-explained-with-a-classic-spongebob-squarepants-episode-54deab2fce39">GANs with Tensorflow</a></li>
+    <li><a href="https://github.com/sugyan/tf-dcgan/blob/master/dcgan.py">DCGAN with Tensorflow</a></li>
+    <li><a href="http://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_lfw_people.html">LFW Sklearn Dataset Documentation</a></li>
+    <li><a href="http://vis-www.cs.umass.edu/lfw/">LFW dataset</a></li> -->
+    </ul>
+
+    <br><br>
+    <style>
+      .myButton {
+        background-color:#44c767;
+        -moz-border-radius:14px;
+        -webkit-border-radius:28px;
+        border-radius:14px;
+        border:1px solid #18ab29;
+        display:inline-block;
+        cursor:pointer;
+        color:#ffffff;
+        font-family:Arial;
+        font-size:17px;
+        padding:16px 31px;
+        text-decoration:none;
+        text-shadow:0px 1px 0px #2f6627;
+      }
+    .myButton:hover {
+      background-color:#5cbf2a;
+      }
+    .myButton:active {
+      position:relative;
+      top:1px;
+      }
+  </style>
+  <a href="../index.html" class="myButton">$\leftarrow$</a>
+
+    </section>
+
+  </body>
+</html>
