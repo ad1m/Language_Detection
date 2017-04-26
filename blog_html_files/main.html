@@ -79,6 +79,7 @@
     <li><b>Input Gate: </b>The input gate controls how much of the newly computed state for the current input that you want to let through.</li>
     <li><b>Forget Gate: </b>The forget gate defines how much of the previous state you want to let through.</li>
     <li><b>Output Gate: </b>The output gate defines how much of the interant state you want to expose to the external network.</li>
+    </ul>
     <p>Mathematically, we can define these gates as equations as follows:</p>
     $$i_t = g(W_{x_i}x_t + W_{h_i}h_{t-1}+b_i)$$
     $$f_t = g(W_{x_f}x_t + W_{h_f}h_{t-1}+b_f)$$
@@ -88,49 +89,48 @@
     $$ c_{in_t} = \text{tanh}\left(W_{xc}x_t + W_{hc}h_{t-1}+b_{c_{in}}\right)$$
     <p>where $h_t = o_t \cdot \text{tanh} \left(c_t\right)$. The state can then be updated as:</p>
     $$c_t = f_t \cdot c_{t-1} + i_t \cdot c_{in_t}$$
+    <p>We can depict all of these equations graphically as:</p>
+    <center><img src="../images/LSTM.png" style="width:350px"></center>
+    <p>The gating allows the cell to keep pieces of information for prolonged periods of time while protecting the gradient inside the cell during training. This ensures that the gradient does not explode or vanish from multiple activations being processed.</p>
     <!--<li><b>Cell Unit: </b>Here, information can be stored in, written to, or read from a cell. This is similar to memory in a computer. This cell makes decisions on what to store, when to read, when to write, and when to erase through gates that open and close.</li> -->
+    
+
+    <h1>Applications:</h1>
+    <ul>
+    <li>Image Captioning - Oriol Vinyas, Alexander Toshev, Samy Bengio, and Dumitru Erhan published <a href="https://arxiv.org/pdf/1411.4555v2.pdf">Show and Tell: A Neural Image Caption Generator</a>. This paper uses an LSTM to automatically describe the content of an image.</li>
+    <br>
+    <li>Hand Writing Generation - In 2014, Alex Graves published <a href="https://arxiv.org/pdf/1308.0850v5.pdf">Generating Sequences With Recurrent Neural Networks</a>. In this paper an LSTM model was used to generate handwriting from text. The handwriting was shown to be realistic cursive in a wide variety of styles.</li>
+    <br>
+    <li>Stock Market Prediction - Tal Perry published the article <a href="https://medium.com/@TalPerry/deep-learning-the-stock-market-df853d139e02">Deep Learning the Stock Market</a>. Here he used an LSTM to predict market prices.</li>
+    <br>
+    <li>Movie Reviews - Jason Brownley published <a href="http://machinelearningmastery.com/sequence-classification-lstm-recurrent-neural-networks-python-keras/">Sequence Classification with LSTM Recurrent Neural Networks in Python with Keras</a> where he uses an LSTM to classify IMDB movie sentiment.</li>
+    <br>
+    <li>Image Generation - In 2015, the Google DeepMind team published <a href="https://arxiv.org/pdf/1502.04623v2.pdf">DRAW: A Recurrent Neural Network For Image Generation</a>. This paper introduces the Deep Recurrent Attentive Writer, DRAW, which generates MNIST digits. DRAW was build with an LSTM layer.</li>
+    <li>Reddit Comment Generator - Braulio Chavez published <a href="https://cs224d.stanford.edu/reports/Chavez.pdf">Reddit Comment Generator</a> where he used LSTM cells to generate comments on Reddit.</li>
     </ul>
 
-    
-
     <h1>Improving Performance of LSTMs:</h1>
-    <p>Add bias of 1 in every neuron.</p>
-
-
-    <h1>Applications & Current Research: </h1>
+    <p>To improve the performance of LSTMs we can attempt to do some of the following:</p>
+    <ul>
+    <li>Adding Regularization - Use l1, l2, or dropout layers.</li>
+    <br>
+    <li>Bias - Adding a bias of 1 in every neuron in an LSTM layer has been noted to improve performance, drastically in some cases.</li>
+    <br>
+    <li>Activation - Use softsign activation funvtion over tanh. Also try softsign over softmax.</li>
+    <br>
+    <li>Optimizers - RMSProp and AdaGrad are good choices for optimizers.</li>
+    <br>
+    <li>Learning Rate - This parameter is very important, a well tuned learning rate can drastically improve performance.</li>
+    <br>
+    <li>Data - Normalizing data can help. Also more data is always better because it helps combat overfitting.</li>
+    </ul>    
+    <!--<h1>Research Problems:</h1> -->
     
-    <h1>Research Problems:</h1>
-    
-
-
-  <h1>Further Resources</h1>
-  <p>A lot of work has been done on LSTMs. Here are some alternate links worth checking out:</p>
-  <h4>Presentations:</h4>
-  <!--<ul>
-  <li><a href="https://www.youtube.com/watch?v=HN9NRhm9waY">Ian Goodfellow AIWTB 2016 Lecture</a></li>
-  <li><a href="https://www.youtube.com/watch?v=RvgYvHyT15E&t=1292s">Ian Goodfellow NIPS 2016 Workshop</a></li>
-  <li><a href="https://arxiv.org/pdf/1701.00160.pdf">Ian Goodfellow 2016 NIPS Tutorial</a></li>
-  <li><a href="https://www.youtube.com/watch?v=QPkb5VcgXAM&t=657s">Soumith Chintala Facebook London Machine Learning Meetup Lecture</a></li>
-  <li><a href="https://www.youtube.com/watch?v=pqkpIfu36Os&index=44&list=PLujxSBD-JXglGL3ERdDOhthD3jTlfudC2">Two Minute Papers Image Editing with GANs</a></li>
-  <li><a href="https://www.youtube.com/watch?v=deyOX6Mt_As&t=30s">Siraj Raval Fresh Machine Learning with GANs</a></li>
-  </ul>
-  <h4>Research Papers:</h4>
-  <ul>
-  <li><a href="https://arxiv.org/pdf/1406.2661.pdf">2014 Ian Goodfellow Generative Adversarial Nets</a></li>
-  <li><a href="https://arxiv.org/pdf/1703.10847.pdf">Music Generation using GANs</a></li>
-  <li><a href="https://arxiv.org/pdf/1606.03498v1.pdf">Improved Techniques for Training GANs</a></li>
-  <li><a href="https://openreview.net/pdf?id=S1HEBe_Jl">Learning to Protect Communications with Adversarial Neural Cryptography</a></li>
-  <li><a href="https://arxiv.org/pdf/1605.05396.pdf">Generative Adversarial Text to Image Synthesis</a></li>
-  <li><a href="https://arxiv.org/pdf/1609.04802.pdf">Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network</a></li>
-  <li><a href="http://web.mit.edu/vondrick/tinyvideo/">Generating Videos with Scene Dynamics</a></li>
-  <li><a href="https://arxiv.org/pdf/1603.07442v3.pdf">Pixel-Level Domain Transfer</a></li>
-  <li><a href"https://arxiv.org/pdf/1511.06434.pdfï%C2%BC‰">Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks</a></li>
-  <li><a href="https://pdfs.semanticscholar.org/42f6/f5454dda99d8989f9814989efd50fe807ee8.pdf">Conditional generative adversarial nets for convolutional face generation</a></li>
-  <li><a href="https://arxiv.org/pdf/1610.01945.pdf">Connecting Generative Adversarial Networks and Actor-Critic Methods</a></li>
-  </ul>  -->
+ 
 
 
     <h1>Building our own LSTM:</h1>
+    <p>Now that we have some background on LSTMs, let us build an LSTM for language detection.</p>
     <!--<p>Now that we understand what a generative adversarial network is and how it works, let's proceed by creating our own GAN. We will specifically implement a deep convolutional generative adversarial network (DCGAN) and generate facial images like we described in the motivating example. For this post click the button below.</p> -->
     <style>
       .myButton {
@@ -160,6 +160,24 @@
 
 
     <h1>References</h1>
+    <ul>
+    <li>Images:</li>
+    <ul>
+    <li>https://apaszke.github.io/lstm-explained.html</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    </ul>
+    <li>Content:</li>
+    <ul>
+    <li>http://www.deeplearningbook.org/contents/rnn.html</li>
+    <li>http://www.wildml.com/2015/10/recurrent-neural-network-tutorial-part-4-implementing-a-grulstm-rnn-with-python-and-theano/</li>
+    <li>https://deeplearning4j.org/lstm.html</li>
+    <li></li>
+    <li></li>
+    </ul>
+    </ul>
    
     </section>
 
