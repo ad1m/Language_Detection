@@ -43,8 +43,14 @@
 
     <section class="main-content">
     <h1>Introduction</h1>
+    <p>If you are a frequent user of Google, you have probably seen this box before:</p>
+    <center><img src="../images/google_translate.png"></center>
+    <p>This is google translate. When you start typing in a sentence to translate, it automatically picks up the current language you are typing in. Let's test it out:</p>
+    <center><img src="../images/google_translate_2.png"></center>
+    <p>We see that we have typed in "bonjour", which means hello in french, and that google has automatically detected that our word is french. Here, Google uses recurrent neural networks to detect the current langauge and then translate it into the user's language of choice.</p>
+    <p>Language detection can be accomplished through Long Short-Term Memory. Let us take on the task of langauge detection using two datasets: a dataset consiting of english sentences and a dataset consitsting of french sentences.</p>
     <!-- Explain why we want to do facial generation and current ways facial generations is done-->
-    <!--<p>Radford's paper <a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks</a> lays the framework and architecture for building a deep convolutional generative adversarial network (DCGAN). Convolutional layers have been great for image based deep learning regarding tasks like image classification in the field of computer vision. Additionally, DCGAN models can improve stability during training so that we hopefully do not encounter issues like mode collapse. Our goal is to build a DCGAN that can generate synthetic facial images. We will follow the steps Radford used in his paper to build out our model.</p>
+    <!--<p>Radford's paper <a href="https://arxiv.org/pdf/1511.06434.pdf">Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks</a> lays the framework and architecture for building a deep convolutional generative adversarial network (DCGAN). Convolutional layers have been great for image based deep learning regarding tasks like image classification in the field of computer vision. Additionally, DCGAN models can improve stability during training so that we hopefully do not encounter issues like mode collapse. Our goal is to build a DCGAN that can generate synthetic facial images. We will follow the steps Radford used in his paper to build out our model.</p> -->
 
     <h1>Environment Setup</h1>
     <p>Below we have a description of each library we will use. Please click the links under installation and documentation to install and learn more about each library.</p>
@@ -67,7 +73,6 @@
     <li>Installation: <a href="https://www.tensorflow.org/install/">TensorFlow Installation</a></li>
     <li>Documentation: <a href="https://www.tensorflow.org/get_started/get_started">TensorFlow Documentation</a></li>
     </ul>
-    <p>Once TensorFlow is installed you will have access to TF-Slim, a lightweight library for defining, training, and evaluating complex models in TensorFlow. This makes writing TensorFlow code easier and quicker while still allowing us to see the fine details of our model and its layers.</p>
     <br>
     <li>Numpy - Numpy is a package for scientific computing that contains many useful operations for a multi-dimensional data structure called an ndarray (np array).</li>
     <ul>
@@ -92,12 +97,11 @@
     <li>Installation: <a href="http://scikit-learn.org/stable/install.html">Sklearn Installation</a></li>
     <li>Documentation: <a href="http://scikit-learn.org/stable/documentation.html">Sklearn Documentation</a></li>
     </ul>
-    <br>
-    <li>PIL - PIL, short for Python Imaging Library, is a powerful library to handle and manipulate images.</li>
+    <!--<li>PIL - PIL, short for Python Imaging Library, is a powerful library to handle and manipulate images.</li>
     <ul>
     <li>Installation: <a href="https://pillow.readthedocs.io/en/4.0.x/installation.html">PIL Installation</a></li>
     <li>Documentation: <a href="https://pillow.readthedocs.io/en/4.0.x/handbook/index.html">PIL Documentation</a></li>
-    </ul>
+    </ul> -->
     <br>
 
     <li>Random - Random allows us to create pseudo-random number generators for various distributions.</li>
@@ -109,6 +113,11 @@
     </ul>
 
     <h1>Data</h1>
+    <p>We will be detecting language between English and French. For this task, we will use the datasets found <a href="https://github.com/GT-CSE6240/proj2/tree/master/data">here</a>. At this link there will be eng.txt and frn.txt. Both datasets contain sentences, in their respective language, from the Universal Declaration of Human Rights.</p>
+
+    <h1>Loading Data</h1>
+    <p>Now that we have our data, we need to load it. To do so we will create a function called xx. In this function we will provide a filepath to the respective eng.txt or frn.txt and will</p>
+    <!--<h1>Data</h1>
     <p>We will be using data from the Labeled Faces in the Wild (LFW) database. This database consists of more than 13,000 grayscale images of faces collected from the web. Additionally, each face has been labeled with the name of the person pictured. The data can be downloaded from <a href="http://vis-www.cs.umass.edu/lfw/">here</a>. Additionally, we can access the datasets module in sklearn and pull the data using the fetch_lfw_people function. This will return our data in a dataset object, which is a dictionary like structure. Let us now proceed to write a class and a few fuctions to read in and format our data.</p>
 
     <p>We start by creating a class called Data_Set. In this class we take in our vector of images. In our init method we will calculate the number of samples we have in the images vector, normalize the images, and set the number of epochs completed and index of the epochs to 0. We will need the number epochs completed and the index of the epochs when we train our generative adversarial network. We will also create some getters for the number of images, number of samples, and the number of epochs completed. Finally, we will create a method called batch_next. This takes in a batch size and will perform a sequential pull of this batch size for our training data. Our class is as follows:</p> -->

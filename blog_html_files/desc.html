@@ -33,7 +33,7 @@
 
   <div class="preview__link" href="#" itemprop="url">
   <center><h1 class="preview__header" itemprop="name">Project Description</h1></center>  
-  <p>Building an LSTM for language detection.</p>
+  <p>LSTMs are useful for building character-sequential prediction models. We will use one to build string scoring models which will then be combined into a single language detector. We have two datasets: eng.txt and frn.txt. We will split them into 80/20 learning/holdout subsets with all letters lowercased for simplicity. Then an LSTM model will be trained for enlglish and another LSTM model will be trained for french. A test dataset will then be generated from the holdout set where we randomly select 100 5-char substrings from the english holdout set and 100 5-char substrings from the french holdout set. We will end up with 200 strings. The labels will be 1 for english and 0 for french. For each test string, we will compute the log likelihood of that string for each model and end up with two numbers: log(Pr(string|eng)) and log(Pr(string|frn)). We will then compute an ROC where the y_hat is the ratio of the two loglieklihood ratios. The ROC on semilogx will be plotted and we will print the AUC-ROC on the plot. We will finally discuss the effectiveness of our model, some alternatives to improve language detection, the pros and cons to the laternatives, and a few ways in which we can improve our model. Finally, we will follow up with some extra credit and explore alternate ways to use this LSTM model for language detection.</p>
   </div>
 
   </main>
