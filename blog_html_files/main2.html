@@ -306,6 +306,180 @@ test_labels = np.array(english_labels + french_labels)
     <span style="color: #0000aa">return</span> model
 </pre></div>
 
+<h1>Prediction & Log Likelihood:</h1>
+<p>For each test string, we need to compute the log likelihood of that string for each model. To do so we will create a function called predict_on_sample which takes in a model and a test value. Here, we will iterate over each charachter, obtain the vector associated with it along with the previous START charachters, and obtain the prediction score for it on the next charachter. Finally, we sum up the logs of these values and return it. We create this function as follows:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">predict_on_sample</span>(model, test_val):
+    start = np.zeros((<span style="color: #009999">1</span>, <span style="color: #009999">1</span>, char_len), dtype=<span style="color: #00aaaa">bool</span>)
+    start_prob = model.predict(start)
+
+    next_vec = start.copy()[<span style="color: #009999">0</span>][<span style="color: #009999">0</span>]
+    probs = []
+
+    probs.append(start_prob[<span style="color: #009999">0</span>,np.argwhere(test_val[<span style="color: #009999">0</span>])[<span style="color: #009999">0</span>][<span style="color: #009999">0</span>]])
+
+    <span style="color: #0000aa">for</span> idx, vec <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(test_val):
+        next_vec = np.append(next_vec, vec).reshape(<span style="color: #009999">1</span>, idx+<span style="color: #009999">2</span>, char_len)
+        next_prob = model.predict(next_vec)
+
+        probs.append(next_prob[<span style="color: #009999">0</span>, np.argwhere(test_val[idx])[<span style="color: #009999">0</span>][<span style="color: #009999">0</span>]])
+        
+    <span style="color: #0000aa">return</span> np.sum(np.log(probs))
+</pre></div>
+    <h1>ROC</h1>
+    <p>Using the above function, we can predict the results on each test string. We can then create a function called predict_results(). We pass in the string along with both the English model and the French model, obtain the predicted probabilities, and compute the Generalized Likelihood Ratio Test (GLRT). The ratio gives us a vector of probability scores, in which we set all values >= 1 to 1, and otherwise 0. We can then obtain the false positive rate and true positive rate from the roc_curve function in the sklearn library and then use those to get the roc_auc from the auc function in sklearn. We create the function as follows:</p>
+
+    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">predict_results</span>(english_model, french_model):
+    english_preds = np.array([predict_on_sample(english_model, x) <span style="color: #0000aa">for</span> x <span style="color: #0000aa">in</span> test_data])
+    french_preds = np.array([predict_on_sample(french_model, x) <span style="color: #0000aa">for</span> x <span style="color: #0000aa">in</span> test_data])
+    ratio_probs = english_preds - french_preds
+        
+    fpr, tpr, _ = roc_curve(test_labels, ratio_probs);
+    roc_auc = auc(fpr, tpr)
+    
+    <span style="color: #0000aa">print</span>(roc_auc)
+
+    <span style="color: #0000aa">return</span> roc_auc, fpr, tpr
+</pre></div>
+<p>Now that we have the ROC, we can create a function called plot_roc_auc_curve to plot our ROC curve, which takes in the false positive rate, the true positive rate, the roc_auc, and a title. We create this function as follows:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">plot_roc_auc_curve</span>(fpr, tpr, roc_auc, title): 
+    plt.figure()
+    lw = <span style="color: #009999">2</span>
+    plt.plot(fpr, tpr, color=<span style="color: #aa5500">&#39;darkorange&#39;</span>,
+             lw=lw, label=<span style="color: #aa5500">&#39;ROC curve (area = %0.2f)&#39;</span> % roc_auc)
+    plt.plot([<span style="color: #009999">0</span>, <span style="color: #009999">1</span>], [<span style="color: #009999">0</span>, <span style="color: #009999">1</span>], color=<span style="color: #aa5500">&#39;navy&#39;</span>, lw=lw, linestyle=<span style="color: #aa5500">&#39;--&#39;</span>)
+    plt.xlim([<span style="color: #009999">0.0</span>, <span style="color: #009999">1.0</span>])
+    plt.ylim([<span style="color: #009999">0.0</span>, <span style="color: #009999">1.05</span>])
+    plt.xlabel(<span style="color: #aa5500">&#39;False Positive Rate&#39;</span>)
+    plt.ylabel(<span style="color: #aa5500">&#39;True Positive Rate&#39;</span>)
+    plt.title(<span style="color: #aa5500">&#39;Receiver operating characteristic for &#39;</span> + title)
+    plt.legend(loc=<span style="color: #aa5500">&quot;lower right&quot;</span>)
+    plt.show()
+</pre></div>
+
+<h1>Hyperparameter Tuning:</h1>
+<p>Above we have set up a functions to create our model LSTM model, obtain the predictions, compute the log likelihood, and compute the ROC. We have not instantiated the model yet as we do not know the optimal hyperparameters. Let us now perform a hyperparameter search. Previously, we wrote a function called train_and_predict(). We cycle though a set range of epochs and evaluate the model quality as the iterations increase. We then take the best performing model.
+Other hyperparameters tuned are the learning rate, decay rate, batch sizes used in training, and size of the LSTM layer. Some of these we tuned manually rather than create a automated function for it. Finally, we found that the best performance is given by epochs=8, learning rate=0.01, decay=0.0, layer_size=256.</p>
+<p>Below we display graphs showing the loss vs. epochs and accuracy vs. epochs for learning rate 0.01 as a demonstration of our parameter selection process.</p>
+<center><img src="http://i.imgur.com/7QhIXwl.jpg"></center>
+<center><img src="http://i.imgur.com/XyPN1xj.jpg"></center>
+
+<h1>Building English & French LSTM Models</h1>
+<p>Let us create our English and French LSTM models with 5 epochs, a step size of 5, and an optimal batch size of 2512:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">models_1 = train_and_predict(<span style="color: #009999">5</span>, <span style="color: #009999">5</span>, <span style="color: #009999">2512</span>)
+
+&gt;&gt;&gt;
+Build model...
+Build model...
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">3</span>s - loss: <span style="color: #009999">3.7206</span> - acc: <span style="color: #009999">0.0221</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">5.3884</span> - acc: <span style="color: #009999">0.1426</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">4.2558</span> - acc: <span style="color: #009999">0.0676</span>     
+Epoch <span style="color: #009999">4</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.5550</span> - acc: <span style="color: #009999">0.1625</span>     
+Epoch <span style="color: #009999">5</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.4811</span> - acc: <span style="color: #009999">0.0550</span>     
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">3</span>s - loss: <span style="color: #009999">3.8357</span> - acc: <span style="color: #009999">0.0711</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.4972</span> - acc: <span style="color: #009999">0.0655</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">4.1910</span> - acc: <span style="color: #009999">0.1103</span>     
+Epoch <span style="color: #009999">4</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.0199</span> - acc: <span style="color: #009999">0.0840</span>     
+Epoch <span style="color: #009999">5</span>/<span style="color: #009999">5</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">2.9137</span> - acc: <span style="color: #009999">0.1732</span>     
+<span style="color: #009999">0.7948</span>
+</pre></div>
+<p>We see that this configuration has given us an ROC of 0.7948.</p>
+<p>Let us now create our LSTM models with 12 epochs, a step size of 3 epochs, and a batch size of 2512:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">models_2 = train_and_predict(<span style="color: #009999">12</span>, <span style="color: #009999">3</span>, <span style="color: #009999">2512</span>)
+
+&gt;&gt;&gt;
+Build model...
+Build model...
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">3</span>s - loss: <span style="color: #009999">3.8244</span> - acc: <span style="color: #009999">0.0319</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.8091</span> - acc: <span style="color: #009999">0.0501</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">4.0902</span> - acc: <span style="color: #009999">0.0630</span>     
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">4</span>s - loss: <span style="color: #009999">3.6929</span> - acc: <span style="color: #009999">0.0592</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">4.6424</span> - acc: <span style="color: #009999">0.1419</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">4.5772</span> - acc: <span style="color: #009999">0.0617</span>     
+<span style="color: #009999">0.8456</span>
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.1018</span> - acc: <span style="color: #009999">0.1625</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.0159</span> - acc: <span style="color: #009999">0.1541</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.0308</span> - acc: <span style="color: #009999">0.1625</span>     
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.7905</span> - acc: <span style="color: #009999">0.1604</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.7677</span> - acc: <span style="color: #009999">0.1554</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.7589</span> - acc: <span style="color: #009999">0.1560</span>     
+<span style="color: #009999">0.8479</span>
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.0133</span> - acc: <span style="color: #009999">0.1625</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">2.9974</span> - acc: <span style="color: #009999">0.1604</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">2.9674</span> - acc: <span style="color: #009999">0.1625</span>     
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.6747</span> - acc: <span style="color: #009999">0.1538</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.7156</span> - acc: <span style="color: #009999">0.1441</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.7864</span> - acc: <span style="color: #009999">0.1444</span>     
+<span style="color: #009999">0.865</span>
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">2.9449</span> - acc: <span style="color: #009999">0.1653</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">2.9600</span> - acc: <span style="color: #009999">0.1520</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">2855</span>/<span style="color: #009999">2855</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.0080</span> - acc: <span style="color: #009999">0.1891</span>     
+Epoch <span style="color: #009999">1</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.7089</span> - acc: <span style="color: #009999">0.1598</span>     
+Epoch <span style="color: #009999">2</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.6826</span> - acc: <span style="color: #009999">0.1526</span>     
+Epoch <span style="color: #009999">3</span>/<span style="color: #009999">3</span>
+<span style="color: #009999">3192</span>/<span style="color: #009999">3192</span> [==============================] - <span style="color: #009999">2</span>s - loss: <span style="color: #009999">3.7564</span> - acc: <span style="color: #009999">0.1507</span>     
+<span style="color: #009999">0.8629</span>
+</pre></div>
+<p>Here, we see that our ROC is now 0.8629, which is much better than that of the model that used 5 epochs.</p>
+<p>We note that there is a lof of variability in model performance. We noticed that our ROC varied from 0.65 to 0.95. Thus, we have re run our above model generation code multiple times and have saved the best performing model. Below we save these best performing models:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">models_1[<span style="color: #009999">3</span>][<span style="color: #009999">0</span>].save(<span style="color: #aa5500">&#39;model_current_e.h5&#39;</span>)
+models_1[<span style="color: #009999">3</span>][<span style="color: #009999">1</span>].save(<span style="color: #aa5500">&#39;model_current_f.h5&#39;</span>)
+</pre></div>
+<p>We can now load the best performing models:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">model_1 = load_model(<span style="color: #aa5500">&#39;model_current_e.h5&#39;</span>)
+model_2 = load_model(<span style="color: #aa5500">&#39;model_current_f.h5&#39;</span>)
+</pre></div>
+<h1>Model Performance:</h1>
+<p>We can now call our functions to obtain the ROC, false positive rate, true positive rate. We call our function with our models as follows:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">roc, fpr, tpr = predict_results(model_1, model_2)
+
+&gt;&gt;&gt;
+<span style="color: #009999">0.9476</span>
+</pre></div>
+<p>Here we see that we have achieved a great ROC of 0.9476.</p>
+<p>Let us now plot our ROC curve:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">plot_roc_auc_curve(fpr, tpr, roc, <span style="color: #aa5500">&#39;English/French Classification&#39;</span>)
+
+&gt;&gt;&gt;
+<center><img src="../images/roc.png"></center>
+</pre></div>
+<p>We see that the above ROC curve looks great.</p>
+
+
+
+
 
 
 
