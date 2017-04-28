@@ -121,8 +121,200 @@
     <h1>Data</h1>
     <p>We will be detecting language between English and French. For this task, we will use the datasets found <a href="https://github.com/GT-CSE6240/proj2/tree/master/data">here</a>. At this link there will be eng.txt and frn.txt. Both datasets contain sentences, in their respective language, from the Universal Declaration of Human Rights.</p>
 
+    <h1>Imports</h1>
+    <p>We start by importing the following libraries:</p>
+    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">__future__</span> <span style="color: #0000aa">import</span> print_function;
+<span style="color: #0000aa">import</span> <span style="color: #00aaaa; text-decoration: underline">sys</span>;
+<span style="color: #0000aa">import</span> <span style="color: #00aaaa; text-decoration: underline">random</span>;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">random</span> <span style="color: #0000aa">import</span> randint
+
+<span style="color: #0000aa">import</span> <span style="color: #00aaaa; text-decoration: underline">numpy</span> <span style="color: #0000aa">as</span> <span style="color: #00aaaa; text-decoration: underline">np</span>;
+
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">keras.models</span> <span style="color: #0000aa">import</span> Sequential;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">keras.layers</span> <span style="color: #0000aa">import</span> Dense, Activation;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">keras.layers</span> <span style="color: #0000aa">import</span> LSTM;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">keras.optimizers</span> <span style="color: #0000aa">import</span> RMSprop;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">keras.utils.data_utils</span> <span style="color: #0000aa">import</span> get_file;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">keras.models</span> <span style="color: #0000aa">import</span> load_model;
+
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">sklearn.cross_validation</span> <span style="color: #0000aa">import</span> train_test_split;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">sklearn.metrics</span> <span style="color: #0000aa">import</span> *;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">sklearn.externals</span> <span style="color: #0000aa">import</span> joblib;
+
+<span style="color: #0000aa">import</span> <span style="color: #00aaaa; text-decoration: underline">matplotlib.pyplot</span> <span style="color: #0000aa">as</span> <span style="color: #00aaaa; text-decoration: underline">plt</span>;
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">IPython.display</span> <span style="color: #0000aa">import</span> clear_output
+<span style="color: #0000aa">from</span> <span style="color: #00aaaa; text-decoration: underline">keras.callbacks</span> <span style="color: #0000aa">import</span> ModelCheckpoint, Callback
+
+<span style="color: #0000aa">import</span> <span style="color: #00aaaa; text-decoration: underline">subprocess</span>;
+<span style="color: #0000aa">import</span> <span style="color: #00aaaa; text-decoration: underline">h5py</span>;
+</pre></div>
+
+
+
     <h1>Loading Data</h1>
-    <p>Now that we have our data, we need to load it. To do so we will create a function called xx. In this function we will provide a filepath to the respective eng.txt or frn.txt and will</p>
+    <p>Now that we have our English and French data, we need to load it. To do so we can open the filepath of the data and then use .read() to read it in. Additionally, we lower case the alphabet in the respective datafiles. Additionally, we will print the length of our English and French corpus so that we can see how much data we are dealing with. We do so as follows:</p>
+    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">english_text = <span style="color: #00aaaa">open</span>(<span style="color: #aa5500">&#39;data/eng.txt&#39;</span>).read().lower()
+french_text = <span style="color: #00aaaa">open</span>(<span style="color: #aa5500">&#39;data/frn.txt&#39;</span>).read().lower()
+
+<span style="color: #0000aa">print</span>(<span style="color: #aa5500">&#39;English corpus length:&#39;</span>, <span style="color: #00aaaa">len</span>(english_text))
+<span style="color: #0000aa">print</span>(<span style="color: #aa5500">&#39;French corpus length:&#39;</span>, <span style="color: #00aaaa">len</span>(french_text))
+
+&gt;&gt;&gt;
+English corpus length: <span style="color: #009999">10746</span>
+French corpus length: <span style="color: #009999">12009</span>
+</pre></div>
+    <p>We see that our Engligh corpus has length 10746 and our French corpus has length 12009.</p>
+
+    <h1>Character Set and Dictionary</h1>
+    <p>Now that we have our English and French text loaded in we will need to obtain the character map for both datasets. To do so we can first create a set of the characters and then iterate over each character to create a dictionary where the keys are the characters and the values are integers from 0 to len(characters). Additionally, we create an inverse dictionary where the keys and values are flipped. The purpose of creating these dictionaries are to map the features to the feature indices in our upcoming design matrix. We do so as follows:</p>
+
+    <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">english_chars = <span style="color: #00aaaa">sorted</span>(<span style="color: #00aaaa">list</span>(<span style="color: #00aaaa">set</span>(english_text)))
+french_chars = <span style="color: #00aaaa">sorted</span>(<span style="color: #00aaaa">list</span>(<span style="color: #00aaaa">set</span>(french_text)))
+
+english_char_map = <span style="color: #00aaaa">dict</span>((c, i) <span style="color: #0000aa">for</span> i, c <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(english_chars))
+french_char_map = <span style="color: #00aaaa">dict</span>((c, i) <span style="color: #0000aa">for</span> i, c <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(french_chars))
+
+english_char_map_inverse = <span style="color: #00aaaa">dict</span>((i, c) <span style="color: #0000aa">for</span> i, c <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(english_chars))
+french_char_map_inverse = <span style="color: #00aaaa">dict</span>((i, c) <span style="color: #0000aa">for</span> i, c <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(french_chars))
+</pre></div>
+
+<h1>Sentence Creation</h1>
+<p>We now create sentences from both the English and French text, with a rolling window of 40 characters. These will serve as our features. To do so we set a maxlength of 40 and a step size of 3. We create an empty list for the sentences and an empty list for the next charaters. We then iterate over the length of the text minus the maxlength with a step size of 3 and append the text of the current character to 40 characters from that character. We also append the next character (character i + 40) to the next characters list. After doing so we will obtain an [x,40] matrix where each row will have length alphabet-size. We will additionally print the number of English and French sentences that we construct. We do so as follows:</p> 
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">maxlen = <span style="color: #009999">40</span>
+step = <span style="color: #009999">3</span>
+
+english_sentences = []
+english_next_chars = []
+<span style="color: #0000aa">for</span> i <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(<span style="color: #009999">0</span>, <span style="color: #00aaaa">len</span>(english_text) - maxlen, step):
+    english_sentences.append(english_text[i: i + maxlen])
+    english_next_chars.append(english_text[i + maxlen])
+
+french_sentences = []
+french_next_chars = []
+<span style="color: #0000aa">for</span> i <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(<span style="color: #009999">0</span>, <span style="color: #00aaaa">len</span>(french_text) - maxlen, step):
+    french_sentences.append(french_text[i: i + maxlen])
+    french_next_chars.append(french_text[i + maxlen])
+    
+<span style="color: #0000aa">print</span>(<span style="color: #aa5500">&#39;nb English sequences:&#39;</span>, <span style="color: #00aaaa">len</span>(english_sentences))
+<span style="color: #0000aa">print</span>(<span style="color: #aa5500">&#39;nb French sequences:&#39;</span>, <span style="color: #00aaaa">len</span>(french_sentences))
+
+&gt;&gt;&gt; 
+nb English sequences: <span style="color: #009999">3569</span>
+nb French sequences: <span style="color: #009999">3990</span>
+</pre></div>
+
+<p>We see that we have created 3569 English sentences and 3990 French sentences.</p>
+<h1>Design Matrix Creation:</h1>
+<p>We can now vectorize the matrices we created above. Here, we create a feature matrix x, which is full of zeros and has size len(sentences),maxlength, character length. We will then let this matrix be of dtype boolean. We create a labels matrix y, full of zeros with size len(sentences), character length. This matrix is also of dtype boolean. We then iterate over the sentences and look at the t, char in the sentence. We set x[i,t,char_map[char]] = 1 in the inner loop and set y[i,char_map[next_chars[i]]] = 1. This will give us our vectorized features. We do so as follows:</p>
+
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">char_len = <span style="color: #00aaaa">max</span>(<span style="color: #00aaaa">len</span>(english_chars), <span style="color: #00aaaa">len</span>(french_chars));
+
+english_x = np.zeros((<span style="color: #00aaaa">len</span>(english_sentences), maxlen, char_len), dtype=np.bool)
+english_y = np.zeros((<span style="color: #00aaaa">len</span>(english_sentences), char_len), dtype=np.bool)
+<span style="color: #0000aa">for</span> i, sentence <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(english_sentences):
+    <span style="color: #0000aa">for</span> t, char <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(sentence):
+        english_x[i, t, english_char_map[char]] = <span style="color: #009999">1</span>
+    english_y[i, english_char_map[english_next_chars[i]]] = <span style="color: #009999">1</span>
+    
+    
+french_x = np.zeros((<span style="color: #00aaaa">len</span>(french_sentences), maxlen, char_len), dtype=np.bool)
+french_y = np.zeros((<span style="color: #00aaaa">len</span>(french_sentences), char_len), dtype=np.bool)
+<span style="color: #0000aa">for</span> i, sentence <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(french_sentences):
+    <span style="color: #0000aa">for</span> t, char <span style="color: #0000aa">in</span> <span style="color: #00aaaa">enumerate</span>(sentence):
+        french_x[i, t, french_char_map[char]] = <span style="color: #009999">1</span>
+    french_y[i, french_char_map[french_next_chars[i]]] = <span style="color: #009999">1</span>
+</pre></div>
+
+<h1>Train/Test Split:</h1>
+<p>Now that we have our Englisn and French features with their corresponding labels, we can use sklearn's train_test_split function to obtain a split of 80% training data and 20% testing data. Here, we will set a random_state = 1024. We do so as follows:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">english_train_x, english_test_x, english_train_y, english_test_y = train_test_split(english_x, english_y, test_size=<span style="color: #009999">0.2</span>, random_state=<span style="color: #009999">1024</span>);
+french_train_x, french_test_x, french_train_y, french_test_y = train_test_split(french_x, french_y, test_size=<span style="color: #009999">0.2</span>, random_state=<span style="color: #009999">1024</span>);
+</pre></div>
+<p>Now that we have our training and testing data, let us look at the shapes of the matrices.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">print</span>(<span style="color: #aa5500">&#39;English Shapes&#39;</span>);
+<span style="color: #0000aa">print</span>(english_train_x.shape);
+<span style="color: #0000aa">print</span>(english_train_y.shape);
+<span style="color: #0000aa">print</span>(english_test_x.shape);
+<span style="color: #0000aa">print</span>(english_test_y.shape);
+<span style="color: #0000aa">print</span>()
+<span style="color: #0000aa">print</span>(<span style="color: #aa5500">&#39;French Shapes&#39;</span>);
+<span style="color: #0000aa">print</span>(french_train_x.shape);
+<span style="color: #0000aa">print</span>(french_train_y.shape);
+<span style="color: #0000aa">print</span>(french_test_x.shape);
+<span style="color: #0000aa">print</span>(french_test_y.shape);
+
+&gt;&gt;&gt;
+English Shapes
+(<span style="color: #009999">2855</span>, <span style="color: #009999">40</span>, <span style="color: #009999">43</span>)
+(<span style="color: #009999">2855</span>, <span style="color: #009999">43</span>)
+(<span style="color: #009999">714</span>, <span style="color: #009999">40</span>, <span style="color: #009999">43</span>)
+(<span style="color: #009999">714</span>, <span style="color: #009999">43</span>)
+
+French Shapes
+(<span style="color: #009999">3192</span>, <span style="color: #009999">40</span>, <span style="color: #009999">43</span>)
+(<span style="color: #009999">3192</span>, <span style="color: #009999">43</span>)
+(<span style="color: #009999">798</span>, <span style="color: #009999">40</span>, <span style="color: #009999">43</span>)
+(<span style="color: #009999">798</span>, <span style="color: #009999">43</span>)
+</pre></div>
+
+<p>Above, we see that both languages have [x, 40, 43] values for training, even though French has 41 total alphabet charachters. We see this because we pad the smaller language with 2 extra columns of all 0s, in order to make sure that our neural network can train properly on the same input shape.</p>
+
+<h1>Generating Test Data:</h1>
+<p>The test split above was our holdout data. For the English and French holdout sets we will generate a new set of test data by randomly selecting 100 5-character substrings from each respective dataset. Here, we will end up with 200 strings, which will be our test features for evaluation. Our labels for the corresponding test data will have a 1 for English and a 0 for French. We will have 100 1's in the test labels and 100 0's. To create this test data we will create a function called random_generate(), which takes in our test data and a key. We start by creating two empty lists called labels, which will hold our labels, and feats, which will hold our features. We have a conditional that check if the key is "english" or "french". If the key is english then the labels vector will contain 100 1's. If it is french than the labels vector will contain 100 0's. We now iterate over range(100) and generate a random number between 0 and the length of the test data passed in. This will represent a random index to pull from inside the test data. We then generate another random integer between 0 and the length of the data in the index minus 5. This will represent a starting character. We can then extract this character plus the next 4 characters to obtain our random 5 character substring. We append this into the features variable. We will call this process for the English data and the French data and then combine the lists of the features and the lists of the labels and make each one a numpy array. We do so as follows:</p>
+
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">random_generate</span>(test_x, key):
+    labels = []
+    feats = []
+    <span style="color: #0000aa">if</span> key == <span style="color: #aa5500">&quot;english&quot;</span>: 
+        labels = [<span style="color: #009999">1</span> <span style="color: #0000aa">for</span> i <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(<span style="color: #009999">100</span>)]
+    <span style="color: #0000aa">elif</span> key == <span style="color: #aa5500">&#39;french&#39;</span>: 
+        labels = [<span style="color: #009999">0</span> <span style="color: #0000aa">for</span> i <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(<span style="color: #009999">100</span>)]
+    <span style="color: #0000aa">else</span>:
+        <span style="color: #0000aa">return</span> feats, labels;
+    
+    <span style="color: #0000aa">for</span> i <span style="color: #0000aa">in</span> <span style="color: #00aaaa">range</span>(<span style="color: #009999">100</span>): 
+        r1 = randint(<span style="color: #009999">0</span>, <span style="color: #00aaaa">len</span>(test_x) - <span style="color: #009999">1</span>)
+        ind = test_x[r1]
+        
+        r2 = randint(<span style="color: #009999">0</span>, <span style="color: #00aaaa">len</span>(ind) - <span style="color: #009999">5</span>)
+        
+        sub_string = ind[r2:r2+<span style="color: #009999">5</span>]
+        
+        feats.append(sub_string)
+        
+    <span style="color: #0000aa">return</span> feats,labels
+    
+english_sample, english_labels = random_generate(english_test_x, <span style="color: #aa5500">&#39;english&#39;</span>)
+french_sample, french_labels = random_generate(french_test_x, <span style="color: #aa5500">&#39;french&#39;</span>)
+
+test_data = np.array(english_sample + french_sample)
+test_labels = np.array(english_labels + french_labels)
+</pre></div>
+
+<h1>LSTM Model Creation:</h1>
+<p>Now that we have our training and test data, we can create our Long Short-Term Memory Model. To do so we will construct a function called build_model. This will set up a Sequential model with an LSTM layer that has 256 neurons followed by a dense layer that has shape number of characters (43) and a softmax activation function. Here we will use an RMSprop optimizer, with a leanring rate of 0.01, and a loss function of categorical_crossentropy. We create our function as follows:</p>
+
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000aa">def</span> <span style="color: #00aa00">build_model</span>(chars):
+    <span style="color: #0000aa">print</span>(<span style="color: #aa5500">&#39;Build model...&#39;</span>)
+    model = Sequential()
+    model.add(LSTM(<span style="color: #009999">256</span>, input_shape=(<span style="color: #00aaaa">None</span>, char_len)))
+    model.add(Dense(char_len))
+    model.add(Activation(<span style="color: #aa5500">&#39;softmax&#39;</span>))
+    
+    optimizer = RMSprop(lr=<span style="color: #009999">0.01</span>)
+    model.compile(loss=<span style="color: #aa5500">&#39;categorical_crossentropy&#39;</span>, optimizer=optimizer, metrics=[<span style="color: #aa5500">&#39;accuracy&#39;</span>])
+    <span style="color: #0000aa">return</span> model
+</pre></div>
+
+
+
+
+
+
+
+
+
+
     <!--<h1>Data</h1>
     <p>We will be using data from the Labeled Faces in the Wild (LFW) database. This database consists of more than 13,000 grayscale images of faces collected from the web. Additionally, each face has been labeled with the name of the person pictured. The data can be downloaded from <a href="http://vis-www.cs.umass.edu/lfw/">here</a>. Additionally, we can access the datasets module in sklearn and pull the data using the fetch_lfw_people function. This will return our data in a dataset object, which is a dictionary like structure. Let us now proceed to write a class and a few fuctions to read in and format our data.</p>
 
