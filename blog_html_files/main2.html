@@ -477,6 +477,27 @@ model_2 = load_model(<span style="color: #aa5500">&#39;model_current_f.h5&#39;</
 </pre></div>
 <p>We see that the above ROC curve looks great.</p>
 
+<h1>Questions</h1>
+<ul>
+<li><b>Is this model good?</b> We see that our model had an ROC of 0.9476. This is a very high ROC and it is a very good model. However, we did intense parameter tuning to arrive at this ROC.</li>
+<li><b>What are 3 Alternatives to language detection with their pros and cons?</b>
+<ul>
+<li></li>
+<li></li>
+<li></li>
+</ul>
+</li>
+<li><b>What are 5 ways in which we could improve our model?</b>
+<ol>
+<li><b>More Data </b> - Having more training and testing data is always better, espeically when we are using deep learning. We had 3569 total English sentences to work with and 3990 French sentences to work with. This is not a huge dataset. Having more data from each dataset would allow us to better train our model to better represent the actual population of the data. If we had more text that looked like English or French our model would be able to better understand the English features compared to the French features. However, more data would increase the computational expense for our model. This task already had some expense to it and adding multiple times the amount of data would drastically increase the runtime.</li>
+<li><b>Alternate Layers</b> - Our model had an LSTM layer and a dense layer. Here, we did not explore the possibility of adding alternate layers such as a dropout layer. A droput layer is a powerful regularization technique. Here, neurons that are randomly selected are ignored during training. This allows our network to be less sensitive to the specific weights of neurons. Thus, our network is capable of better generalization and is less likely to overfit the training data. Less overfitting is definitely a pro. Adding and experimenting with different layers can help improve performance, but a con is that this would add computational expense to our program in terms of runtime and in human labor as we would have to find the optimal hyperparameters for the layers. Also, this is not guranteed to help in terms of performance. It may very well be that our network performs worse with a dropout layer or a different layer structure.</li>
+<li><b>Different Optimizer</b> - In our model we used an RMSprop optimizer with a learning rate of 0.01. We did not try alternate optimization techniques such as SGD, Adagrad, Adadelta, Adam , etc. With regards to Long Short-Term Memory, Adam and Adadelta usually are a fine choice. We tuned the learning rate for the RMSprop, but did not experiment with these alternate optimizers. Potentially, we could have achieved better performance or converged more quickly than with our choice of optimizer. However, it is not guranteed that a different optimizer would drastically improve the performance. Also, it might take longer to converge than our choice of optimizer. Additionally, running experiments with these would take additional time.</li>
+<li><b>Bias</b> - Adding a bias of 1 has been shown to help improve the performance and prevent overfitting especially in regards to LSTM models. When we created our LSTM in keras we did not set use_bias = True. Having this bias vector could have lead to less overfitting in our model. A con would be that our ROC could potentially drop and our model would not look as good as it does.</li>
+<li><b>More Epochs</b> - We used a maximum of 12 epochs when we trained our model. Using a GPU allows for more training in a smaller time frame. Instead of running 12 epochs we could have run 100. Running this experiment and obtaining shorter run time is definitely a positive, but a con would be that the model converges after a few iterations and there is no gained preformance by using the GPU to run more epochs.</li>
+</ol> 
+</li>
+</ul>
+
 
 
 
