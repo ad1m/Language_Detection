@@ -1,5 +1,7 @@
-# Language_Detection with LSTMs
+# Language Detection with LSTMs
+By: Adam Lieberman, Ravish Chawla, & Garrett Mallory 
 
+Note: We had spoken with Dr. Gardner about working in a group of 3, which he approved. 
 
 The Blog containing background information on LSTMs and a walkthrough of our code can be found at:
 
@@ -28,12 +30,13 @@ https://ad1m.github.io/Language_Detection/index.html
 
 5. js 
 	
-	- contains teh javascript for the blog 
+	- contains the javascript for the blog 
 
 
 6. data 
 	
-	- contains teh data used in the code 
+	- contains the data used in the code 
+	- A subdirectory called Langauges contains the data    	for the extra credit portion of our project. Please   	place data at the approproate level if needed. 
 
 
 7. index.html
